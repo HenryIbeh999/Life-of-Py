@@ -1,0 +1,399 @@
+{
+  "@small_button": {
+    "colours": {
+      "normal_border": "#000",
+      "normal_bg": "#95b190cb,#a6e279da,270",
+      "normal_text": "Black",
+      "hovered_bg": "#95b190cb,#8db866ff,270",
+      "hovered_border": "Black",
+      "active_bg": "#95b190cb,#9bc07fff,270",
+      "hovered_text": "Black",
+      "active_border": "#000"
+    },
+    "font": {
+      "name": "Pixel",
+      "size": 20,
+      "regular_path": "./data/gui/fonts/Kenney Future.ttf"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "10",
+      "border_width": "2"
+    }
+  },
+  "@misc_button": {
+    "colours": {
+      "normal_bg": "#bebebe6c",
+      "normal_border": "#bebebe6c",
+      "hovered_bg": "#afafaf65",
+      "active_bg": "#8f9294"
+    },
+    "misc": {
+      "shape": "rectangle",
+      "border_width": "0"
+    }
+  },
+  "#pause_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/pause.png"
+      },
+      "hovered_image": {
+        "path": "./data/images/ui/hovered_pause.png"
+      }
+    }
+  },
+  "#sound_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/sound_on.png"
+      },
+      "hovered_image": {
+        "path": "./data/images/ui/hovered_sound_on.png"
+      },
+      "selected_image": {
+        "path": "./data/images/ui/sound_off.png"
+      }
+    }
+  },
+  "@ui_button": {
+    "colours": {
+      "normal_bg": "#95b190cb",
+      "normal_border": "#353535ff",
+      "hovered_border": "#353535ff",
+      "hovered_bg": "#b8b8b8e3",
+      "active_bg": "#929292ee",
+      "active_border": "#353535ff"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "border_width": "1",
+      "shape_corner_radius": "10"
+    }
+  },
+  "#job_doctor_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/job_doctor.png"
+      }
+    }
+  },
+  "#job_clerk_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/job_clerk.png"
+      }
+    }
+  },
+  "#job_cashier_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/job_cashier.png"
+      }
+    }
+  },
+  "#job_accountant_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/job_accountant.png"
+      }
+    }
+  },
+  "#job_salesman_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/job_salesman.png"
+      }
+    }
+  },
+  "#job_programmer_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/job_programmer.png"
+      }
+    }
+  },
+  "#job_cook_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/job_cook.png"
+      }
+    }
+  },
+  "#action_doctor_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/action_doctor.png"
+      }
+    }
+  },
+  "#action_burger_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/action_order_burger.png"
+      }
+    }
+  },
+  "#action_pizza_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/action_order_pizza.png"
+      }
+    }
+  },
+
+  "#action_change_name_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/action_change_name.png"
+      }
+    }
+  },
+  "#action_deposit_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/action_deposit.png"
+      }
+    }
+  },
+  "#action_withdraw_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/action_withdrawal.png"
+      }
+    }
+  },
+  "#save_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/save.png"
+      },
+      "hovered_image": {
+        "path": "./data/images/ui/hovered_save.png"
+      }
+    }
+  },
+  "#cancel_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/cancel.png"
+      },
+      "hovered_image": {
+        "path": "./data/images/ui/hovered_cancel.png"
+      }
+    }
+  },
+  "#accept_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/accept.png"
+      },
+      "hovered_image": {
+        "path": "./data/images/ui/hovered_accept.png"
+      }
+    }
+  },
+  "#continue_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/continue.png"
+      },
+      "hovered_image": {
+        "path": "./data/images/ui/hovered_continue.png"
+      }
+    }
+  },
+  "@panel": {
+    "colours": {
+      "dark_bg": "#95b190cb,#93e98cdc,270",
+      "normal_border": "#000"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "7"
+    }
+  },
+  "#status_panel": {
+    "colours": {
+      "dark_bg": "#95b190cb,#93e98cdc,270"
+    },
+    "misc": {
+      "shape_corner_radius": "7"
+    }
+  },
+  "#player_status_panel": {
+    "colours": {
+      "dark_bg": "#95b190cb"
+    },
+    "misc": {
+      "shape_corner_radius": "7,7,0,0"
+    }
+  },
+  "#menu_panel": {
+    "colours": {
+      "normal_border": "Black"
+    },
+    "misc": {
+      "shape_corner_radius": "15"
+    }
+  },
+  "#pause_panel": {
+    "colours": {
+      "dark_bg": "#95b190cb,#93e98cdc,270"
+    }
+  },
+  "#load_panel": {
+    "colours": {
+      "dark_bg": "#95b190cb,#93e98cdc,270"
+    }
+  },
+  "#action_panel": {
+    "colours": {
+      "dark_bg": "#95b190cb,#93e98cdc,270",
+      "normal_border": "Black"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "20",
+      "border_width": "1"
+    }
+  },
+  "#small_action_panel": {
+    "colours": {
+      "dark_bg": "#95b190cb,#7ebb7ce3,90",
+      "normal_border": "Black"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "20,20,0,0",
+      "border_width": "1"
+    }
+  },
+  "label": {
+    "colours": {
+      "normal_text": "Black"
+    },
+    "font": {
+      "name": "Roboto",
+      "size": "17",
+      "regular_path": "./data/gui/fonts/RobotoMono-Regular.ttf"
+    }
+  },
+  "#day_text": {
+    "colours": {
+      "normal_text": "#313332"
+    },
+    "font": {
+      "name": "Kenney R-S",
+      "size": "30",
+      "regular_path": "./data/gui/fonts/Kenney Future.ttf"
+    }
+  },
+  "@high_progress_bar": {
+    "colours": {
+      "normal_text": "#e4e4e4ff",
+      "filled_bar": "#238a04ff,#56c412ff,180",
+      "unfilled_bar": "#e0e0e0df,#c5c5c5df, 180",
+      "text_shadow": "#1a1b1b",
+      "normal_border": "#000"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "3",
+      "border_width": "1"
+    }
+  },
+  "@low_progress_bar": {
+    "colours": {
+      "normal_text": "#e4e4e4ff",
+      "filled_bar": "#d33131df,#915050e9,180",
+      "unfilled_bar": "#e0e0e0df,#c5c5c5df, 180",
+      "text_shadow": "#1a1b1b",
+      "normal_border": "#000"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "3",
+      "border_width": "1"
+    }
+  },
+  "@menu_text": {
+    "colours": {
+      "normal_text": "Black"
+    },
+    "font": {
+      "name": "Pixel",
+      "size": "20",
+      "regular_path": "./data/gui/fonts/Kenney Blocks.ttf"
+    }
+  },
+  "#money_text": {
+    "colours": {
+      "normal_text": "Black"
+    },
+    "font": {
+      "name": "fonty",
+      "size": "16",
+      "regular_path": "./data/gui/fonts/NotoSansMono_SemiCondensed-Regular.ttf"
+    }
+  },
+  "@action_text": {
+    "font": {
+      "name": "NotoSansJP",
+      "size": "17",
+      "regular_path": "./data/gui/fonts/NotoSansJP-Regular.ttf"
+    }
+  },
+  "#popup_label": {
+    "font": {
+      "name": "Kenney",
+      "size": "16",
+      "regular_path": "./data/gui/fonts/NotoSansMono_SemiCondensed-Regular.ttf"
+    }
+  },
+  "#credit_head": {
+    "font": {
+      "name": "Roboto",
+      "size": "20",
+      "regular_path": "./data/gui/fonts/Kosugi-Regular.ttf"
+    }
+  },
+  "#credit_sub1": {
+    "font": {
+      "name": "Roboto",
+      "size": "14",
+      "regular_path": "./data/gui/fonts/RobotoMono-Regular.ttf"
+    }
+  },
+  "#credit_sub2": {
+    "font": {
+      "name": "Roboto",
+      "size": "14",
+      "regular_path": "./data/gui/fonts/RobotoMono-Regular.ttf"
+    }
+  },
+  "@input": {
+    "colours": {
+      "normal_border": "#000",
+      "dark_bg": "#bebebe6c",
+      "normal_text": "Black"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "10",
+      "border_width": "2"
+    }
+  },
+  "#new_name_input": {
+    "colours": {
+      "normal_border": "#000",
+      "dark_bg": "#95b190cb,#93e98cdc,270",
+      "normal_text": "Black"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "7",
+      "border_width": "1"
+    }
+  }
+}
