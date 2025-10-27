@@ -15,7 +15,7 @@ class PopupPanel(UIPanel):
 
     def __init__(self, manager, text, screen_size,
                  duration=2000, fade_time=400,
-                 width=400, height=80,
+                 width=500, height=80,
                  slide_speed=400):
         screen_w, screen_h = screen_size
         base_x = screen_w - width - 20

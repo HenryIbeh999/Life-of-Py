@@ -31,7 +31,7 @@ def show_action(game, primary_action_type, secondary_action_type):
             game.in_drug_store = True
             game.in_burgershop = False
             game.in_office = False
-            game.in_cityhall = False
+            game.in_bank = False
             set_panel_text(game)
             game.primary_action_label.set_text("Health check-up")
 
@@ -51,7 +51,7 @@ def show_action(game, primary_action_type, secondary_action_type):
             game.in_drug_store = False
             game.in_burgershop = True
             game.in_office = False
-            game.in_cityhall = False
+            game.in_bank = False
             set_panel_text(game)
 
         if primary_action_type == "programmer" and secondary_action_type == "clerk":
@@ -67,7 +67,7 @@ def show_action(game, primary_action_type, secondary_action_type):
             game.in_drug_store = False
             game.in_burgershop = False
             game.in_office = True
-            game.in_cityhall = False
+            game.in_bank = False
             set_panel_text(game)
 
         if primary_action_type == "accountant" and secondary_action_type == "bank":
@@ -84,7 +84,7 @@ def show_action(game, primary_action_type, secondary_action_type):
             game.in_drug_store = False
             game.in_burgershop = False
             game.in_office = False
-            game.in_cityhall = True
+            game.in_bank = True
             set_panel_text(game)
     else:
         game.action_panel.visible = False
@@ -147,7 +147,7 @@ def set_panel_text(game):
             game.secondary_job_label.set_text("Work as a Clerk")
         game.primary_action_label.set_text("Change your name")
 
-    if game.in_cityhall:
+    if game.in_bank:
         if game.player.job is None:
             game.primary_job_label.set_text(f"Work in the Financial field")
         elif game.player.job.name != "Accountant":
@@ -273,3 +273,16 @@ def change_name(game):
         pass
 
 
+def set_transaction_type(game):
+    if game.in_bank:
+        game.bank_panel.visible = True
+        game.bank_panel.slide_to((0, 50), duration=1.0, easing=pytweening.easeOutBack)
+        game.bank_type_label.visible = True
+        game.bank_prompt.visible = True
+        game.bank_cancel_btn.visible = True
+        game.bank_continue_btn.visible = True
+        game.min_type_label.visible = True
+        game.max_type_label.visible = True
+        if game.deposit_mode:
+            game.bank_type_label.set_text("Deposit")
+            game.max_type_label.set_text(f"${max(0,round(game.player.money,2))}")

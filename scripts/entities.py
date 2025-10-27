@@ -132,6 +132,41 @@ class Player(PhysicsEntity):
             self.happiness -= self.job.happiness_cost
             self.happiness = max(self.happiness,0)
 
+    def deposit_money(self,amount,game):
+        if self.money >= amount:
+            self.money -= amount
+            self.deposit += amount
+            PopupPanel.show_message(
+                manager=game.manager,
+                text=f"Successfully deposited ${amount} to your account!",
+                screen_size=game.screen.get_size()
+            )
+        else:
+            PopupPanel.show_message(
+                manager=game.manager,
+                text="Insufficient funds!",
+                screen_size=game.screen.get_size()
+            )
+
+    def withdraw_money(self,amount,game):
+        if amount <= self.deposit:
+            self.money += amount
+            self.deposit -= amount
+            PopupPanel.show_message(
+                manager=game.manager,
+                text=f"Withdrawal of ${amount} successful!",
+                screen_size=game.screen.get_size()
+            )
+        else:
+            self.money += self.deposit
+            self.deposit = 0
+            PopupPanel.show_message(
+                manager=game.manager,
+                text=f"Withdrawal of ${self.deposit} successful!",
+                screen_size=game.screen.get_size()
+            )
+
+
 class Item:
     def __init__(self, game, e_type, pos, size,item_name): # Initializes the entity class
         self.game = game

@@ -376,7 +376,8 @@
     "colours": {
       "normal_border": "#000",
       "dark_bg": "#bebebe6c",
-      "normal_text": "Black"
+      "normal_text": "Black",
+      "text_cursor": "Black"
     },
     "misc": {
       "shape": "rounded_rectangle",

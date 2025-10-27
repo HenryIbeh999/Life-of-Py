@@ -41,7 +41,7 @@ class Game:
         self.in_drug_store = False
         self.in_burgershop = False
         self.in_office = False
-        self.in_cityhall = False
+        self.in_bank = False
         self.deposit_mode = False
         self.withdraw_mode = False
         #-----------------------------Indicators ----------------------------- #
@@ -140,11 +140,11 @@ class Game:
         self.change_name_continue_btn = UIButton(relative_rect=pygame.Rect(0,120,94,30),text="",manager=self.manager, anchors={"centerx": "centerx"},container=self.change_name_panel,object_id=ObjectID(class_id="@misc_button",object_id="#continue_button"))
 
 
-        self.bank_panel = AnimatedPanel(relative_rect=(0, 50, 350, 200), anchors={"centery": "centery"}, manager=self.manager, object_id=ObjectID(class_id="@panel", object_id="#bank_panel"))
+        self.bank_panel = AnimatedPanel(relative_rect=(0, 50, 300, 200), anchors={"centery": "centery"}, manager=self.manager, object_id=ObjectID(class_id="@panel", object_id="#bank_panel"),visible=False)
         self.bank_cancel_btn = UIButton(relative_rect=pygame.Rect(5,10,30,30),text="",manager=self.manager,container=self.bank_panel,object_id=ObjectID(class_id="@misc_button",object_id="#cancel_button"))
-        self.bank_type_label = UILabel(relative_rect=(0,10,-1,-1), text="",anchors={"centerx": "centerx"} ,manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#bank_type'))
-        self.min_type_label = UILabel(relative_rect=(65,-25,-1,-1), text="0",anchors={"centery": "centery"} , manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#min_type_label'))
-        self.max_type_label = UILabel(relative_rect=(260,-25,-1,-1), text="1000",anchors={"centery": "centery"} , manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#max_type_label'))
+        self.bank_type_label = UILabel(relative_rect=(0,10,-1,-1), text="",anchors={"centerx": "centerx"} ,manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#bank_type_label'))
+        self.min_type_label = UILabel(relative_rect=(35,-25,-1,-1), text=f"${1.00}",anchors={"centery": "centery"} , manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#min_type_label'))
+        self.max_type_label = UILabel(relative_rect=(235,-25,-1,-1), text="",anchors={"centery": "centery"} , manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#max_type_label'))
         self.bank_prompt = UITextEntryLine(relative_rect=pygame.Rect(0, 50, 150, 50), manager=self.manager,container=self.bank_panel,placeholder_text="", anchors={'centerx': 'centerx'},object_id=ObjectID(class_id="@input", object_id="#new_name_input"))
         self.bank_continue_btn = UIButton(relative_rect=pygame.Rect(0,120,94,30),text="",manager=self.manager, anchors={"centerx": "centerx"},container=self.bank_panel,object_id=ObjectID(class_id="@misc_button",object_id="#continue_button"))
 
@@ -171,10 +171,7 @@ class Game:
         running = True
         while running:
             self.display.fill((0,0,0,0))
-            # Clear secondary surface each frame to avoid ghosting / leftover pixels
-            self.display_2.fill((0, 0, 0))  # if you used convert() -- opaque black clear
-            # if you used SRCALPHA/convert_alpha(), use:
-            # self.display_2.fill((0,0,0,0))
+            self.display_2.fill((0, 0, 0))
 
             mpos = self.manager.mouse_position
 
@@ -211,7 +208,7 @@ class Game:
 
             self.tile_map.render(self.display, offset=render_scroll)
 
-            if not self.pause_panel.visible and not self.action_panel.visible:
+            if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible:
                 self.player.update(self.tile_map, (self.movement[1] - self.movement[0], self.movement[3]- self.movement[2]))
 
             try:
@@ -392,6 +389,25 @@ class Game:
                                 self.player.job = load_jobs()[4]
                             else:
                                 self.player.work(self)
+                            set_panel_text(self)    
+                            # -----------Bank_Action_Buttons----------- #
+                        if self.in_bank:
+                            if self.player.job is None:
+                                PopupPanel.show_message(
+                                    manager=self.manager,
+                                    text="You now work as an Accountant!",
+                                    screen_size=self.screen.get_size()
+                                )
+                                self.player.job = load_jobs()[3]
+                            elif self.player.job.name !="Accountant":
+                                PopupPanel.show_message(
+                                    manager=self.manager,
+                                    text="You now work as an Accountant!",
+                                    screen_size=self.screen.get_size()
+                                )
+                                self.player.job = load_jobs()[3]
+                            else:
+                                self.player.work(self)
                             set_panel_text(self)
 
 
@@ -460,6 +476,10 @@ class Game:
                                 self.player.work(self)
                             set_panel_text(self)
 
+                        if self.in_bank:
+                            self.deposit_mode = True
+                            set_transaction_type(self)
+
 
 
                     if event.ui_element == self.primary_action_button:
@@ -506,11 +526,33 @@ class Game:
                         self.change_name_prompt.visible = False
                         self.change_name_continue_btn.visible = False
 
+                    if event.ui_element == self.bank_cancel_btn:
+                        self.bank_prompt.clear()
+                        self.bank_panel.visible = False
+                        self.bank_type_label.visible = False
+                        self.min_type_label.visible = False
+                        self.max_type_label.visible = False
+                        self.bank_cancel_btn.visible = False
+                        self.bank_prompt.visible = False
+                        self.bank_continue_btn.visible = False
+
                     if event.ui_element == self.change_name_continue_btn:
                         if not self.is_paused:
                             self.old_name = self.player.name
                             self.player.name = self.change_name_prompt.text
 
+                    if event.ui_element == self.bank_continue_btn:
+                        if not self.is_paused:
+                            if self.deposit_mode:
+                                try:
+                                    self.player.deposit_money(amount=float(self.bank_prompt.text),game=self)
+                                except ValueError:
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="Enter an actual number!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                print(self.player.deposit)
 
                 self.manager.process_events(event)
             dt = self.clock.tick(60)
