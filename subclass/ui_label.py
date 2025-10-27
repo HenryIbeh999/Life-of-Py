@@ -44,7 +44,7 @@ class MoneyAnimator:
             self.elapsed += dt
             t = min(self.elapsed / self.animation_time, 1.0)
             interpolated = self.current_value + (self.target_value - self.current_value) * t
-            self.label.set_text(f"${interpolated:,.0f}")
+            self.label.set_text(f"${round(float(interpolated),2)}")
 
             if t >= 1.0:
                 self.active = False

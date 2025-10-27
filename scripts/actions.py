@@ -283,6 +283,3 @@ def set_transaction_type(game):
         game.bank_continue_btn.visible = True
         game.min_type_label.visible = True
         game.max_type_label.visible = True
-        if game.deposit_mode:
-            game.bank_type_label.set_text("Deposit")
-            game.max_type_label.set_text(f"${max(0,round(game.player.money,2))}")

@@ -28,6 +28,7 @@ class Game:
         self.player = player
         self.menu = menu
         self.player.name = self.player.name[0]
+        self.player.money = round((float(self.player.money)),2)
         self.old_name = self.player.name
         self.saved_name = self.player.name
 
@@ -90,7 +91,7 @@ class Game:
         self.money_image = Coin(self,(165,70),(16,16))
         self.player_money_label = UILabel(relative_rect=pygame.Rect(180,60,-1,-1),text=f"${self.player.money}",manager=self.manager,container=self.status_panel, object_id=ObjectID(class_id="@text",object_id="#money_text"))
         self.money_animator = MoneyAnimator(self.player_money_label)
-        self.money_animator.current_value = self.player.money
+        self.money_animator.current_value = round((float(self.player.money)),2)
         self.energy_image = UIImage(relative_rect=pygame.Rect(20,100,28,28),image_surface=self.assets['energy'],manager=self.manager,container=self.status_panel)
         self.energy_bar = UIProgressBar(relative_rect=pygame.Rect(48,100,180,27),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#hunger_bar"))
         self.smooth_energy_bar = SmoothProgressBar(self.energy_bar)
@@ -171,7 +172,7 @@ class Game:
         running = True
         while running:
             self.display.fill((0,0,0,0))
-            self.display_2.fill((0, 0, 0))
+            self.display_2.fill((159, 226, 255))
 
             mpos = self.manager.mouse_position
 
@@ -216,7 +217,7 @@ class Game:
             except AttributeError:
                 self.player_job_label.set_text(f"{self.player.job}")
             self.player_name_label.set_text(f"{self.player.name}")
-            self.money_animator.set_target(round(self.player.money,2))
+            self.money_animator.set_target(self.player.money)
             self.smooth_energy_bar.set_value(float(self.player.energy))
             if self.player.energy <= 30.0:
                 self.energy_bar.change_object_id("@low_progress_bar")
@@ -233,6 +234,14 @@ class Game:
                 self.hunger_bar.change_object_id("@low_progress_bar")
             else:
                 self.hunger_bar.change_object_id("@high_progress_bar")
+
+
+            if self.deposit_mode:
+                self.bank_type_label.set_text("Deposit")
+                self.max_type_label.set_text(f"${max(0.0,self.player.money)}")
+            elif self.withdraw_mode:
+                self.bank_type_label.set_text("Withdraw")
+                self.max_type_label.set_text(f"${max(0.0,self.player.deposit)}")
             self.player.render(self.display, offset=render_scroll)
 
 
@@ -477,6 +486,7 @@ class Game:
                             set_panel_text(self)
 
                         if self.in_bank:
+                            self.withdraw_mode = False
                             self.deposit_mode = True
                             set_transaction_type(self)
 
@@ -502,6 +512,11 @@ class Game:
 
                         if self.in_office:
                             change_name(self)
+
+                        if self.in_bank:
+                            self.deposit_mode = False
+                            self.withdraw_mode = True
+                            set_transaction_type(self)
 
                     if event.ui_element == self.secondary_action_button:
                         # -----------Burger_Shop_Action_Buttons----------- #
@@ -552,7 +567,18 @@ class Game:
                                         text="Enter an actual number!",
                                         screen_size=self.screen.get_size()
                                     )
-                                print(self.player.deposit)
+                            elif self.withdraw_mode:
+                                try:
+                                    self.player.withdraw_money(amount=float(self.bank_prompt.text),game=self)
+                                except ValueError:
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="Enter an actual number!",
+                                        screen_size=self.screen.get_size()
+                                    )
+
+                            else:
+                                continue
 
                 self.manager.process_events(event)
             dt = self.clock.tick(60)
