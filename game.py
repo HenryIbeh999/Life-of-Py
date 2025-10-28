@@ -1,4 +1,4 @@
-from scripts.entities import Coin
+from scripts.entities import *
 from scripts.utils import Animation, load_images, load_image
 from scripts.tilemap import TileMap
 import pygame
@@ -52,11 +52,9 @@ class Game:
             self.location = "home"
 
         self.assets = {
-            'decor': load_images('tiles/decor'),
             'terrain': load_images('tiles/terrain'),
             'large_decor': load_images('tiles/large_decor'),
             'stone': load_images('tiles/stone'),
-            'building': load_images('tiles/building'),
             'location' : load_image(f'{self.location}.jpg'),
             'bed': load_images('tiles/bed'),
             'toilet': load_images('tiles/toilet'),
@@ -69,6 +67,7 @@ class Game:
             'painting': load_images('tiles/painting'),
             'fireplace': load_images('tiles/fireplace'),
             'item/coin' : Animation(load_images('coins')),
+            'item/fireplace' : Animation(load_images('tiles/fireplace')),
             'job' : load_image('ui/job.png'),
             'energy' : load_image('ui/energy.png'),
             'happiness' : load_image('ui/happiness.png'),
@@ -102,12 +101,12 @@ class Game:
         self.smooth_happiness_bar = SmoothProgressBar(self.happiness_bar)
 
         #******************* MISC ****************************#
-        self.misc_status_panel = UIPanel(relative_rect=pygame.Rect(0,0,400,80),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#misc_status_panel"),anchors={"centerx":"centerx"})
+        self.misc_status_panel = UIPanel(relative_rect=pygame.Rect(50,0,500,80),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#misc_status_panel"),anchors={"centerx":"centerx"})
         self.pause_btn = UIButton(relative_rect=pygame.Rect(20,0,30,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Pause Game",object_id=ObjectID(class_id="@misc_button",object_id="#pause_button"),anchors={"centery":"centery"})
         self.sound_btn = UIButton(relative_rect=pygame.Rect(70,0,30,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Mute BG music",object_id=ObjectID(class_id="@misc_button",object_id="#sound_button"),anchors={"centery":"centery"})
-        self.day_image = UIImage(relative_rect=pygame.Rect(-50,0,30,30),image_surface=self.assets['calender'],manager=self.manager,container=self.misc_status_panel,anchors={"center": "center"})
-        self.day_label = UILabel(relative_rect=pygame.Rect(30, 0, -1, -1), text=f"Day {player.day}", manager=self.manager, container=self.misc_status_panel, object_id=ObjectID(class_id="@text", object_id="#day_text"), anchors={"center": "center"})
-        self.save_btn = UIButton(relative_rect=pygame.Rect(300,0,62,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Save Game",object_id=ObjectID(class_id="@misc_button",object_id="#save_button"),anchors={"centery":"centery"})
+        self.day_image = UIImage(relative_rect=pygame.Rect(120,0,30,30),image_surface=self.assets['calender'],manager=self.manager,container=self.misc_status_panel,anchors={"centery": "centery"})
+        self.day_label = UILabel(relative_rect=pygame.Rect(0, 0, -1, -1), text=f"Day {player.day}", manager=self.manager, container=self.misc_status_panel, object_id=ObjectID(class_id="@text", object_id="#day_text"), anchors={"center": "center"})
+        self.save_btn = UIButton(relative_rect=pygame.Rect(400,0,62,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Save Game",object_id=ObjectID(class_id="@misc_button",object_id="#save_button"),anchors={"centery":"centery"})
         #******************* MISC ****************************#
 
         #******************* PAUSED ****************************#
@@ -152,6 +151,10 @@ class Game:
 
 #******************** UI **********************#
 
+        # ******************** ENTITIES **********************#
+
+        # ******************** ENTITIES **********************#
+
         self.tile_map =TileMap(self,tile_size=16)
         self.load_map(self.location)
         self.run()
@@ -162,6 +165,8 @@ class Game:
         for spawner in self.tile_map.extract([('spawners', 0),('spawners', 1)]):
             if spawner['variant'] == 0:
                 self.player.pos = spawner['pos']
+            if spawner['variant'] == 1:
+                self.fireplace = Fireplace(self, pos=spawner['pos'], size=[48, 48])
         self.scroll = [0,0]
 
 
@@ -207,6 +212,11 @@ class Game:
                 self.display_2.blit(self.assets['location'], (bg_x, bg_y))
 
             self.tile_map.render(self.display, offset=render_scroll)
+
+            if self.is_home:
+                self.fireplace.update(self.tile_map,(0,0))
+                self.fireplace.render(self.display, offset=render_scroll)
+
 
             if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible:
                 self.player.update(self.tile_map, (self.movement[1] - self.movement[0], self.movement[3]- self.movement[2]))
@@ -274,7 +284,17 @@ class Game:
                                 if self.player.pos[0] in range(200, 260) and self.player.pos[1] in range(100,140):
                                     exit_house(self)
                                 elif self.player.pos[0] in range(448, 502) and self.player.pos[1] in range(193,235):
-                                    advance_day(self)
+                                    if self.player.energy <= 100:
+                                        advance_day(self)
+                                    else:
+                                        PopupPanel.show_message(manager=self.manager,
+                                                                text=f"You are not tired enough",
+                                                                screen_size=self.screen.get_size())
+                                    if self.player.day % 5 == 0:
+                                        PopupPanel.show_message(manager=self.manager,
+                                                                text=f"It's good",
+                                                                screen_size=self.screen.get_size())
+
                             elif self.location == "suburb":
                                 if self.player.pos[0] in range(600, 704) and self.player.pos[1] in range(500, 540):
                                     exit_suburb(self)
@@ -500,8 +520,17 @@ class Game:
                     if event.ui_element == self.primary_action_button:
                         # -----------Medical_Action_Buttons----------- #
                         if self.in_drug_store:
-                            self.player.happiness += 20
-                            self.player.happiness = min(self.player.happiness,100)
+                            if self.player.money >= 20:
+                                self.player.happiness += 20
+                                self.player.money -= 20
+                                self.player.happiness = min(self.player.happiness,100)
+                            else:
+                                PopupPanel.show_message(
+                                    manager=self.manager,
+                                    text="You can't afford healthcare!",
+                                    screen_size=self.screen.get_size()
+                                )
+
                         # -----------Burger_Shop_Action_Buttons----------- #
                         if self.in_burgershop:
                             if self.player.money >= 20:
@@ -630,5 +659,3 @@ class Game:
             self.smooth_energy_bar.update(dt / 1000.0)
             self.smooth_hunger_bar.update(dt / 1000.0)
             self.smooth_happiness_bar.update(dt / 1000.0)
-
-

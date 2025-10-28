@@ -21,7 +21,6 @@ class Editor:
         # Load game assets (player sprite, tiles, etc.)
         self.assets = {
             'terrain': load_images('tiles/terrain'),
-            'decor': load_images('tiles/decor'),
             'large_decor': load_images('tiles/large_decor'),
             'bed': load_images('tiles/bed'),
             'toilet': load_images('tiles/toilet'),
@@ -34,7 +33,6 @@ class Editor:
             'painting': load_images('tiles/painting'),
             'fireplace': load_images('tiles/fireplace'),
             'stone': load_images('tiles/stone'),
-            'building': load_images('tiles/building'),
             'spawners': load_images('tiles/spawners')
 
         }

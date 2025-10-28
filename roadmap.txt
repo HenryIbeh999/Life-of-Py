@@ -22,6 +22,3 @@ Make a separate screen for the game menu
 #TODO 8
 Make a transition animation
 
-
-448 193
-

@@ -200,8 +200,16 @@ class Coin(Item):
 
     def update(self,tile_map, movement=(0, 0)):
         super().update(tile_map,movement=movement)
-
         self.set_action('coin')
+
+
+class Fireplace(Item):
+    def __init__(self,game,pos,size):
+        super().__init__(game, 'item', pos, size,item_name='fireplace')
+
+    def update(self,tile_map, movement=(0, 0)):
+        super().update(tile_map,movement=movement)
+        self.set_action('fireplace')
 
 
 
