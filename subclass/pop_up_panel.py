@@ -64,7 +64,7 @@ class PopupPanel(UIPanel):
         PopupPanel.active_popup = self
 
     @staticmethod
-    def show_message(manager, text, screen_size, duration=3000, fade_time=400):
+    def show_message(manager, text, screen_size, duration=4000, fade_time=400):
         """Shows or updates the popup with new text."""
         if PopupPanel.active_popup:
             popup = PopupPanel.active_popup

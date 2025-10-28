@@ -2,6 +2,7 @@ from pygame_gui.core import ObjectID
 from scripts.utils import load_image
 import pytweening
 import pygame
+from subclass.pop_up_panel import PopupPanel
 
 def show_action(game, primary_action_type, secondary_action_type):
     if game.is_action_panel is True:
@@ -203,7 +204,7 @@ def exit_house(game):
 
     game.load_map(game.location)
 
-    game.circle_transition(game)
+    circle_transition(game)
 
 
 def exit_suburb(game):
@@ -212,7 +213,15 @@ def exit_suburb(game):
 
     game.load_map(game.location)
 
-    game.circle_transition(game)
+    circle_transition(game)
+
+def exit_town(game):
+    game.location = "suburb"
+    game.assets['location'] = load_image(f'{game.location}.jpg')
+
+    game.load_map(game.location)
+
+    circle_transition(game)
 
 def enter_house(game):
     game.is_home = True
@@ -283,3 +292,21 @@ def set_transaction_type(game):
         game.bank_continue_btn.visible = True
         game.min_type_label.visible = True
         game.max_type_label.visible = True
+
+def gain_interest(game):
+    rate = 0.4
+    principal = game.player.deposit
+    day = game.player.day
+    interest = round(float((principal * rate * day)/100),2)
+
+    return interest
+
+
+def advance_day(game):
+    circle_transition(game)
+    game.player.energy = 100.0
+    game.player.day += 1
+    if game.player.deposit > 0:
+        interest = gain_interest(game)
+        game.player.deposit += interest
+        PopupPanel.show_message(manager=game.manager,text=f"You have gained a ${interest} interest on your deposit",screen_size=game.screen.get_size())

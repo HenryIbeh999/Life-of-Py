@@ -347,7 +347,7 @@
   "#popup_label": {
     "font": {
       "name": "Kenney",
-      "size": "16",
+      "size": "18",
       "regular_path": "./data/gui/fonts/NotoSansMono_SemiCondensed-Regular.ttf"
     }
   },

@@ -49,8 +49,7 @@ class Game:
 
 
         if self.is_home:
-            self.location = "town"
-        # self.manager.set_visual_debug_mode(is_active=True)
+            self.location = "home"
 
         self.assets = {
             'decor': load_images('tiles/decor'),
@@ -144,9 +143,9 @@ class Game:
         self.bank_panel = AnimatedPanel(relative_rect=(0, 50, 300, 200), anchors={"centery": "centery"}, manager=self.manager, object_id=ObjectID(class_id="@panel", object_id="#bank_panel"),visible=False)
         self.bank_cancel_btn = UIButton(relative_rect=pygame.Rect(5,10,30,30),text="",manager=self.manager,container=self.bank_panel,object_id=ObjectID(class_id="@misc_button",object_id="#cancel_button"))
         self.bank_type_label = UILabel(relative_rect=(0,10,-1,-1), text="",anchors={"centerx": "centerx"} ,manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#bank_type_label'))
-        self.min_type_label = UILabel(relative_rect=(35,-25,-1,-1), text=f"${1.00}",anchors={"centery": "centery"} , manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#min_type_label'))
-        self.max_type_label = UILabel(relative_rect=(235,-25,-1,-1), text="",anchors={"centery": "centery"} , manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#max_type_label'))
-        self.bank_prompt = UITextEntryLine(relative_rect=pygame.Rect(0, 50, 150, 50), manager=self.manager,container=self.bank_panel,placeholder_text="", anchors={'centerx': 'centerx'},object_id=ObjectID(class_id="@input", object_id="#new_name_input"))
+        self.min_type_label = UILabel(relative_rect=(10,-25,-1,-1), text=f"${1.00}",anchors={"centery": "centery"} , manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#min_type_label'))
+        self.max_type_label = UILabel(relative_rect=(215,-25,-1,-1), text="",anchors={"centery": "centery"} , manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#max_type_label'))
+        self.bank_prompt = UITextEntryLine(relative_rect=pygame.Rect(-15, 50, 150, 50), manager=self.manager,container=self.bank_panel,placeholder_text="", anchors={'centerx': 'centerx'},object_id=ObjectID(class_id="@input", object_id="#new_name_input"))
         self.bank_continue_btn = UIButton(relative_rect=pygame.Rect(0,120,94,30),text="",manager=self.manager, anchors={"centerx": "centerx"},container=self.bank_panel,object_id=ObjectID(class_id="@misc_button",object_id="#continue_button"))
 
         #*******************ACTIONS SECTION********************#
@@ -219,6 +218,7 @@ class Game:
             self.player_name_label.set_text(f"{self.player.name}")
             self.money_animator.set_target(self.player.money)
             self.smooth_energy_bar.set_value(float(self.player.energy))
+            self.day_label.set_text(f"Day {self.player.day}")
             if self.player.energy <= 30.0:
                 self.energy_bar.change_object_id("@low_progress_bar")
             else:
@@ -238,7 +238,7 @@ class Game:
 
             if self.deposit_mode:
                 self.bank_type_label.set_text("Deposit")
-                self.max_type_label.set_text(f"${max(0.0,self.player.money)}")
+                self.max_type_label.set_text(f"${max(0.0,round(self.player.money,2))}")
             elif self.withdraw_mode:
                 self.bank_type_label.set_text("Withdraw")
                 self.max_type_label.set_text(f"${max(0.0,self.player.deposit)}")
@@ -271,13 +271,18 @@ class Game:
                     if event.key == pygame.K_x:
                         if self.clickable:
                             if self.location == "home":
-                                exit_house(self)
+                                if self.player.pos[0] in range(200, 260) and self.player.pos[1] in range(100,140):
+                                    exit_house(self)
+                                elif self.player.pos[0] in range(448, 502) and self.player.pos[1] in range(193,235):
+                                    advance_day(self)
                             elif self.location == "suburb":
                                 if self.player.pos[0] in range(600, 704) and self.player.pos[1] in range(500, 540):
                                     exit_suburb(self)
                                 elif self.player.pos[0] in range(240, 270) and self.player.pos[1] in range(230, 250):
                                     enter_house(self)
                             elif self.location == "town":
+                                if self.player.pos[0] in range(-15, 0) and self.player.pos[1] in range(163, 277):
+                                    exit_town(self)
 
                                 # DRUG STORE TRIGGER
                                 if self.player.pos[0] in range(49, 85) and self.player.pos[1] in range(150, 165):
@@ -591,13 +596,15 @@ class Game:
             self.manager.draw_ui(self.screen)
 
             if self.location == "home":
-                if self.player.pos[0] in range(200, 260) and self.player.pos[1] in range(100,140):
+                if (self.player.pos[0] in range(200, 260) and self.player.pos[1] in range(100,140) or
+                self.player.pos[0] in range(448, 502) and self.player.pos[1] in range(193,235)):
                     interact()
                 else:
                     self.clickable = False
 
             elif self.location == "suburb":
-                if self.player.pos[0] in range(240, 270) and self.player.pos[1] in range(230,250) or  self.player.pos[0] in range(600, 704) and self.player.pos[1] in range(500,540):
+                if (self.player.pos[0] in range(240, 270) and self.player.pos[1] in range(230,250) or
+                        self.player.pos[0] in range(600, 704) and self.player.pos[1] in range(500,540)):
                     interact()
                 else:
                     self.clickable = False
@@ -606,8 +613,9 @@ class Game:
                 if (self.player.pos[0] in range(49, 85) and self.player.pos[1] in range(150,165) or
                     self.player.pos[0] in range(225, 272) and self.player.pos[1] in range(161,170) or
                     self.player.pos[0] in range(449, 485) and self.player.pos[1] in range(481,490) or
-                    self.player.pos[0] in range(65, 130) and self.player.pos[1] in range(481,500)
-                ) :
+                    self.player.pos[0] in range(65, 130) and self.player.pos[1] in range(481,500) or
+                    self.player.pos[0] in range(-15, 0) and self.player.pos[1] in range(163, 277)
+                    ) :
                     interact()
                 else:
                     self.clickable = False

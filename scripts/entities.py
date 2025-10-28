@@ -81,12 +81,12 @@ class Player(PhysicsEntity):
     def __init__(self, game, pos , size):
         super().__init__(game,'player', pos, size)
         self.name = ""
-        self.money = 0.0
+        self.money = round(0.0,2)
         self.happiness = 100.0
         self.energy = 100.0
         self.hunger = 100.0
         self.job = None
-        self.deposit = 0.0
+        self.deposit = round(0.0,2)
         self.day = 1
 
     def update(self,tile_map, movement=(0, 0)):
