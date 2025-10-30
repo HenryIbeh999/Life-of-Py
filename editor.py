@@ -16,22 +16,10 @@ class Editor:
         self.display = pygame.Surface((512, 384))  # Internal display for scaling
         self.clock = pygame.time.Clock()  # Clock to control the frame rate
         self.movement = [False, False, False, False]  # Movement flags for left and right
-        self.location = "home"
+        self.location = "town"
 
         # Load game assets (player sprite, tiles, etc.)
         self.assets = {
-            'terrain': load_images('tiles/terrain'),
-            'large_decor': load_images('tiles/large_decor'),
-            'bed': load_images('tiles/bed'),
-            'toilet': load_images('tiles/toilet'),
-            'furniture': load_images('tiles/furniture'),
-            'structure': load_images('tiles/structure'),
-            'wall': load_images('tiles/wall'),
-            'rug': load_images('tiles/rug'),
-            'shelve': load_images('tiles/shelve'),
-            'sofas': load_images('tiles/sofas'),
-            'painting': load_images('tiles/painting'),
-            'fireplace': load_images('tiles/fireplace'),
             'stone': load_images('tiles/stone'),
             'spawners': load_images('tiles/spawners')
 

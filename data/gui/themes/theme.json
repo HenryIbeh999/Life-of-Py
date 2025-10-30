@@ -141,7 +141,6 @@
       }
     }
   },
-
   "#action_change_name_button": {
     "images": {
       "normal_image": {
@@ -349,6 +348,26 @@
       "name": "Kenney",
       "size": "18",
       "regular_path": "./data/gui/fonts/NotoSansMono_SemiCondensed-Regular.ttf"
+    }
+  },
+  "#dead_label": {
+    "colours": {
+      "normal_text": "#970001"
+    },
+    "font": {
+      "name": "Pixel Square",
+      "size": "60",
+      "regular_path": "./data/gui/fonts/Kenney Pixel Square.ttf"
+    }
+  },
+  "#small_dead_label": {
+    "colours": {
+      "normal_text": "#970001"
+    },
+    "font": {
+      "name": "Pixel Square",
+      "size": "20",
+      "regular_path": "./data/gui/fonts/Kenney Pixel Square.ttf"
     }
   },
   "#credit_head": {

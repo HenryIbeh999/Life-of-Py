@@ -1,3 +1,4 @@
+import time
 from scripts.entities import *
 from scripts.utils import Animation, load_images, load_image
 from scripts.tilemap import TileMap
@@ -29,9 +30,11 @@ class Game:
         self.menu = menu
         self.player.name = self.player.name[0]
         self.player.money = round((float(self.player.money)),2)
-        self.player.happiness = 0
         self.old_name = self.player.name
         self.saved_name = self.player.name
+        self.player.day = 4
+        self.player.money = 300
+        self.player.energy = 50
 
         #-----------------------------Indicators ----------------------------- #
         self.location = ""
@@ -46,6 +49,7 @@ class Game:
         self.in_bank = False
         self.deposit_mode = False
         self.withdraw_mode = False
+        self.is_dead = False
         #-----------------------------Indicators ----------------------------- #
 
 
@@ -63,7 +67,6 @@ class Game:
             'hunger' : load_image('ui/hunger.png'),
             'x_button' : load_image('ui/x_button.png'),
             "cursor": load_image("cursor/cursor.png"),
-            "calender": load_image("ui/calender.png"),
             "ui_character": load_image(f"ui/ui_character.png"),
 
         }
@@ -93,7 +96,6 @@ class Game:
         self.misc_status_panel = UIPanel(relative_rect=pygame.Rect(50,0,500,80),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#misc_status_panel"),anchors={"centerx":"centerx"})
         self.pause_btn = UIButton(relative_rect=pygame.Rect(20,0,30,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Pause Game",object_id=ObjectID(class_id="@misc_button",object_id="#pause_button"),anchors={"centery":"centery"})
         self.sound_btn = UIButton(relative_rect=pygame.Rect(70,0,30,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Mute BG music",object_id=ObjectID(class_id="@misc_button",object_id="#sound_button"),anchors={"centery":"centery"})
-        self.day_image = UIImage(relative_rect=pygame.Rect(120,0,30,30),image_surface=self.assets['calender'],manager=self.manager,container=self.misc_status_panel,anchors={"centery": "centery"})
         self.day_label = UILabel(relative_rect=pygame.Rect(0, 0, -1, -1), text=f"Day {player.day}", manager=self.manager, container=self.misc_status_panel, object_id=ObjectID(class_id="@text", object_id="#day_text"), anchors={"center": "center"})
         self.save_btn = UIButton(relative_rect=pygame.Rect(400,0,62,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Save Game",object_id=ObjectID(class_id="@misc_button",object_id="#save_button"),anchors={"centery":"centery"})
         #******************* MISC ****************************#
@@ -163,7 +165,11 @@ class Game:
         circle_transition(self)
         running = True
         while running:
-            self.display.fill((0,0,0,0))
+            if self.is_dead:
+                self.display.fill((0,0,0))
+            else:
+                self.display.fill((0, 0, 0, 0))
+
             self.display_2.fill((159, 226, 255))
             dt = self.clock.tick(60) / 1000.0
 
@@ -186,7 +192,7 @@ class Game:
             screen_y = int(player_y * self.screen.get_height() / self.display.get_height())
 
             def interact():
-                if self.is_action_panel is False and self.is_paused is False:
+                if self.is_action_panel is False and self.is_paused is False and not self.pause_panel.visible and not self.is_dead:
                     self.clickable = True
                     self.screen.blit(self.assets["x_button"], (screen_x - 5, screen_y - 60))
                 else:
@@ -201,14 +207,11 @@ class Game:
                 self.display_2.blit(self.assets['location'], (bg_x, bg_y))
 
             self.tile_map.render(self.display, offset=render_scroll)
-            #
-            # if self.is_home:
-            #     self.fireplace.update(self.tile_map,(0,0))
-            #     self.fireplace.render(self.display, offset=render_scroll)
 
 
-            if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible:
+            if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible and not self.is_dead:
                 self.player.update(self.tile_map, (self.movement[1] - self.movement[0], self.movement[3]- self.movement[2]))
+                self.player.render(self.display, offset=render_scroll)
 
             try:
                 self.player_job_label.set_text(f"{self.player.job.name}")
@@ -241,7 +244,6 @@ class Game:
             elif self.withdraw_mode:
                 self.bank_type_label.set_text("Withdraw")
                 self.max_type_label.set_text(f"${max(0.0,self.player.deposit)}")
-            self.player.render(self.display, offset=render_scroll)
 
 
             for event in pygame.event.get():
@@ -273,26 +275,25 @@ class Game:
                                 if self.player.pos[0] in range(100, 132) and self.player.pos[1] in range(250,260):
                                     exit_house(self)
                                 elif self.player.pos[0] in range(10, 80) and self.player.pos[1] in range(177,235):
-                                    if end_life(self):
-                                        PopupPanel.show_message(
-                                            manager=self.manager,
-                                            text="You are dead!",
-                                            screen_size=self.screen.get_size()
-                                        )
-                                        for item in self.menu.save_list:
-                                            item.visible = False
-                                        self.menu.run()
-                                    if self.player.energy <= 100:
-                                        advance_day(self)
-
+                                    self.is_dead = end_life(self)
+                                    if self.is_dead:
+                                        self.player.energy = 0
+                                        self.player.hunger = 0
+                                        self.clickable = False
+                                        self.save_btn.disable()
+                                        self.save_btn.hide()
+                                        self.sound_btn.disable()
+                                        self.sound_btn.hide()
                                     else:
-                                        PopupPanel.show_message(manager=self.manager,
-                                                                text=f"You are not tired enough",
-                                                                screen_size=self.screen.get_size())
-                                    if self.player.day % 5 == 0:
-                                        PopupPanel.show_message(manager=self.manager,
-                                                                text=f"It's good",
-                                                                screen_size=self.screen.get_size())
+                                        if self.player.energy <= 70:
+                                            advance_day(self)
+                                            if self.player.day % 5 == 0:
+                                                tax_player(self)
+
+                                        else:
+                                            PopupPanel.show_message(manager=self.manager,
+                                                                    text=f"You are not tired enough",
+                                                                    screen_size=self.screen.get_size())
 
                             elif self.location == "suburb":
                                 if self.player.pos[0] in range(600, 704) and self.player.pos[1] in range(500, 540):
@@ -342,8 +343,13 @@ class Game:
 
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:
                     if event.ui_element == self.pause_btn:
-                        self.is_paused = not self.is_paused
-                        pause(self)
+                        if self.is_dead:
+                            for item in self.menu.save_list:
+                                item.visible = False
+                                self.menu.run()
+                        else:
+                            self.is_paused = not self.is_paused
+                            pause(self)
 
 
                     if event.ui_element == self.pause_menu_btn:

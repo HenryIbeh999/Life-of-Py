@@ -1,4 +1,6 @@
 from pygame_gui.core import ObjectID
+from pygame_gui.elements import UILabel
+
 from scripts.utils import load_image
 import pytweening
 import pygame
@@ -307,10 +309,13 @@ def advance_day(game):
     circle_transition(game)
     game.player.energy = 100.0
     game.player.day += 1
-    if game.player.deposit > 0:
-        interest = gain_interest(game)
-        game.player.deposit += interest
-        PopupPanel.show_message(manager=game.manager,text=f"You have gained a ${interest} interest on your deposit",screen_size=game.screen.get_size())
+
+    if game.player.day % 2 == 0:
+        if game.player.deposit > 0:
+            interest = gain_interest(game)
+            game.player.deposit += interest
+            PopupPanel.show_message(manager=game.manager,text=f"You have gained a ${interest} interest on your deposit",screen_size=game.screen.get_size())
+    return
 
 
 def end_life(game):
@@ -323,6 +328,64 @@ def end_life(game):
         return False
 
     elif game.player.happiness == 0:
+        center = (game.display_2.get_width() // 2, game.display_2.get_height() // 2)
+        max_radius = int((game.display_2.get_width() // 2 + game.display_2.get_height() // 2) // 0.5)
+        start_time = pygame.time.get_ticks()
+        dead_label = UILabel(relative_rect=(0,0,-1,-1), anchors={"center":"center"},
+                             text="YOU ARE DEAD!!!",manager=game.manager,object_id=ObjectID("@label","#dead_label"),visible=False)
+        small_dead_label = UILabel(relative_rect=(0,80,-1,-1), anchors={"center":"center"},
+                             text="Try to be happy next time:)",manager=game.manager,object_id=ObjectID("@label","#small_dead_label"),visible=False)
+
+        while True:
+            dead_label.visible = True
+            small_dead_label.visible = True
+            now = pygame.time.get_ticks()
+            elapsed = now - start_time
+            progress = min(1, elapsed / 2000)
+            radius = int(progress * max_radius)
+
+            # Draw game scene
+            game.display.fill((0, 0, 0, 0))
+            game.display_2.fill((159, 226, 255))
+            game.display_2.blit(game.assets['location'], (100, 0))
+            game.tile_map.render(game.display, offset=(0, 0))
+            # self.player.render(self.display, offset=(0, 0))
+            game.display_2.blit(game.display, (0, 0))
+
+            # Create transition mask
+            mask = pygame.Surface(game.display_2.get_size(), pygame.SRCALPHA)
+            mask.fill((0, 0, 0, 255))
+            pygame.draw.circle(mask, (0, 0, 0, 0), center, radius)
+
+            game.display_2.blit(mask, (0, 0))
+
+            # Draw to screen
+            game.screen.blit(pygame.transform.scale(game.display_2, game.screen.get_size()), (0, 0))
+
+            pygame.display.update()
+
+            if progress >= 1:
+                game.player.pos[0] = int(game.player.pos[0])
+                game.player.pos[1] = int(game.player.pos[1])
+                break
+
         return True
 
 
+def tax_player(game):
+    if game.player.money < 200:
+        if game.player.deposit < 200:
+            return
+        else:
+            taxable_income = (game.player.deposit * 10)/100
+            game.player.deposit -= taxable_income
+            PopupPanel.show_message(manager=game.manager,
+                                    text=f"It's tax time, ${taxable_income} has been taken.",
+                                    screen_size=game.screen.get_size())
+
+    else:
+        taxable_income = (game.player.money * 10) / 100
+        game.player.money -= taxable_income
+        PopupPanel.show_message(manager=game.manager,
+                                text=f"It's tax time, ${taxable_income} has been taken from you.",
+                                screen_size=game.screen.get_size())
