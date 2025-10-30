@@ -115,6 +115,7 @@ class Player(PhysicsEntity):
                 text="You are tired, get some sleep!",
                 screen_size=game.screen.get_size()
             )
+
         elif self.hunger <= 0:
             PopupPanel.show_message(
                 manager=game.manager,
@@ -158,11 +159,9 @@ class Player(PhysicsEntity):
                 screen_size=game.screen.get_size()
             )
         else:
-            self.money += self.deposit
-            self.deposit = 0
             PopupPanel.show_message(
                 manager=game.manager,
-                text=f"Withdrawal of ${self.deposit} successful!",
+                text=f"You're not that rich, yet!",
                 screen_size=game.screen.get_size()
             )
 

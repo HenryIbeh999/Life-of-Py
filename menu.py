@@ -47,8 +47,6 @@ class Menu:
         self.assets = {
             "menu" : load_image("menu.jpg"),
             "cursor": load_image("cursor/cursor.png"),
-            'terrain': load_images('tiles/terrain'),
-            'large_decor': load_images('tiles/large_decor'),
             'stone': load_images('tiles/stone'),
             'save': load_image('ui/save.png'),
             'player/idle': Animation(load_images('entities/player/idle'), img_dur=6),

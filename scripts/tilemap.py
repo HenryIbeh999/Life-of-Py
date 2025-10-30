@@ -74,54 +74,25 @@ class TileMap:
                                                  self.tile_size - 15, self.tile_size - 15))
         # Off-grid/large tiles
 
-        # for tile in self.off_grid_tiles:
-        #     # building
-        #     if tile['type'] in ['structure']:  # Add all solid types
-        #         rects.append(pygame.Rect(tile['pos'][0], tile['pos'][1], tile['size'][0], tile['size'][1]))
-        #     # trees
-        #     if tile['type'] in ['large_decor']:  # Add all solid types
-        #         if tile['variant'] == 20:
-        #             rects.append(pygame.Rect(tile['pos'][0] + 80, tile['pos'][1] + 120, tile['size'][0] - 30,
-        #                                      tile['size'][1] - 40))
-        #         if tile['variant'] == 6:
-        #             rects.append(pygame.Rect(tile['pos'][0], tile['pos'][1], tile['size'][0] + 40,
-        #                                      tile['size'][1] + 30))
+        for tile in self.off_grid_tiles:
+            # building
+            if tile['type'] in ['stone']:  # Add all solid types
+                rects.append(pygame.Rect(tile['pos'][0], tile['pos'][1] - 10,
+                                         8, 1))
         return rects
 
-        #
-        # #Bridges
-        # for tile in self.off_grid_tiles:
-        #     if tile['type'] in ['large_decor'] :# Add all solid types
-        #         if tile['variant'] == 0 :
-        #             rects.append(pygame.Rect(tile['pos'][0] + 5, tile['pos'][1] + 10, tile['size'][0], tile['size'][1] - 90))
-        #
-        #
-        #
-        #
-        # #Wells
-        # for tile in self.off_grid_tiles:
-        #     if tile['type'] in ['large_decor'] :  # Add all solid types
-        #         if tile['variant'] in (2, 3):
-        #             rects.append(pygame.Rect(tile['pos'][0] , tile['pos'][1], tile['size'][0], tile['size'][1]))
-        # return rects
 
     def render(self, surf, offset=(0, 0)):
-        # # Render tiles that are not aligned to the grid
-        # for tile in self.off_grid_tiles:
-        #     surf.blit(self.game.assets[tile['type']][tile['variant']],
-        #               (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1]))
-
         for x in range(offset[0] // self.tile_size, (offset[0] + surf.get_width()) // self.tile_size + 1):
             for y in range(offset[1] // self.tile_size, (offset[1] + surf.get_height()) // self.tile_size + 1):
                 loc = f"{str(x)};{str(y)}"
                 if loc in self.tile_map:
                     tile = self.tile_map[loc]
-                    if tile['type'] in ['terrain', 'stone', 'wall', 'structure']:
+                    if tile['type'] in ['stone','spawners']:
                         surf.blit(self.game.assets[tile['type']][tile['variant']], (
                         tile['pos'][0] * self.tile_size - offset[0], tile['pos'][1] * self.tile_size - offset[1]))
 
         # Render tiles that are not aligned to the grid
         for tile in self.off_grid_tiles:
-            if tile['type'] not in ['terrain', 'stone']:
-                surf.blit(self.game.assets[tile['type']][tile['variant']],
-                          (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1]))
+            surf.blit(self.game.assets[tile['type']][tile['variant']],
+                      (tile['pos'][0] - offset[0], tile['pos'][1] - offset[1]))

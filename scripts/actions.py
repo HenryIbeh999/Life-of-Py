@@ -200,7 +200,7 @@ def pause(game):
 def exit_house(game):
     game.is_home = False
     game.location = "suburb"
-    game.assets['location'] = load_image(f'{game.location}.jpg')
+    game.assets['location'] = load_image(f'{game.location}.png')
 
     game.load_map(game.location)
 
@@ -209,7 +209,7 @@ def exit_house(game):
 
 def exit_suburb(game):
     game.location = "town"
-    game.assets['location'] = load_image(f'{game.location}.jpg')
+    game.assets['location'] = load_image(f'{game.location}.png')
 
     game.load_map(game.location)
 
@@ -217,7 +217,7 @@ def exit_suburb(game):
 
 def exit_town(game):
     game.location = "suburb"
-    game.assets['location'] = load_image(f'{game.location}.jpg')
+    game.assets['location'] = load_image(f'{game.location}.png')
 
     game.load_map(game.location)
 
@@ -226,7 +226,7 @@ def exit_town(game):
 def enter_house(game):
     game.is_home = True
     game.location = "home"
-    game.assets['location'] = load_image(f'{game.location}.jpg')
+    game.assets['location'] = load_image(f'{game.location}.png')
 
     game.load_map(game.location)
 
@@ -244,7 +244,8 @@ def circle_transition(game, duration=1000):
 
         # Draw game scene
         game.display.fill((0, 0, 0, 0))
-        game.display_2.blit(game.assets['location'], (0 - 50, 0 - 50))
+        game.display_2.fill((159, 226, 255))
+        game.display_2.blit(game.assets['location'], (0,0))
         game.tile_map.render(game.display, offset=(0, 0))
         # self.player.render(self.display, offset=(0, 0))
         game.display_2.blit(game.display, (0, 0))
@@ -310,3 +311,18 @@ def advance_day(game):
         interest = gain_interest(game)
         game.player.deposit += interest
         PopupPanel.show_message(manager=game.manager,text=f"You have gained a ${interest} interest on your deposit",screen_size=game.screen.get_size())
+
+
+def end_life(game):
+    if 0 < game.player.happiness <= 40:
+        PopupPanel.show_message(
+            manager=game.manager,
+            text="You really need a health checkup!",
+            screen_size=game.screen.get_size()
+        )
+        return False
+
+    elif game.player.happiness == 0:
+        return True
+
+

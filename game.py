@@ -29,6 +29,7 @@ class Game:
         self.menu = menu
         self.player.name = self.player.name[0]
         self.player.money = round((float(self.player.money)),2)
+        self.player.happiness = 0
         self.old_name = self.player.name
         self.saved_name = self.player.name
 
@@ -49,25 +50,13 @@ class Game:
 
 
         if self.is_home:
-            self.location = "home"
+            self.location = "town"
+
 
         self.assets = {
-            'terrain': load_images('tiles/terrain'),
-            'large_decor': load_images('tiles/large_decor'),
             'stone': load_images('tiles/stone'),
-            'location' : load_image(f'{self.location}.jpg'),
-            'bed': load_images('tiles/bed'),
-            'toilet': load_images('tiles/toilet'),
-            'furniture': load_images('tiles/furniture'),
-            'structure': load_images('tiles/structure'),
-            'wall': load_images('tiles/wall'),
-            'rug': load_images('tiles/rug'),
-            'shelve': load_images('tiles/shelve'),
-            'sofas': load_images('tiles/sofas'),
-            'painting': load_images('tiles/painting'),
-            'fireplace': load_images('tiles/fireplace'),
+            'location' : load_image(f'{self.location}.png'),
             'item/coin' : Animation(load_images('coins')),
-            'item/fireplace' : Animation(load_images('tiles/fireplace')),
             'job' : load_image('ui/job.png'),
             'energy' : load_image('ui/energy.png'),
             'happiness' : load_image('ui/happiness.png'),
@@ -146,7 +135,6 @@ class Game:
         self.max_type_label = UILabel(relative_rect=(215,-25,-1,-1), text="",anchors={"centery": "centery"} , manager=self.manager,container=self.bank_panel, object_id = ObjectID(class_id='@action_text', object_id='#max_type_label'))
         self.bank_prompt = UITextEntryLine(relative_rect=pygame.Rect(-15, 50, 150, 50), manager=self.manager,container=self.bank_panel,placeholder_text="", anchors={'centerx': 'centerx'},object_id=ObjectID(class_id="@input", object_id="#new_name_input"))
         self.bank_continue_btn = UIButton(relative_rect=pygame.Rect(0,120,94,30),text="",manager=self.manager, anchors={"centerx": "centerx"},container=self.bank_panel,object_id=ObjectID(class_id="@misc_button",object_id="#continue_button"))
-
         #*******************ACTIONS SECTION********************#
 
 #******************** UI **********************#
@@ -165,8 +153,8 @@ class Game:
         for spawner in self.tile_map.extract([('spawners', 0),('spawners', 1)]):
             if spawner['variant'] == 0:
                 self.player.pos = spawner['pos']
-            if spawner['variant'] == 1:
-                self.fireplace = Fireplace(self, pos=spawner['pos'], size=[48, 48])
+            # if spawner['variant'] == 1:
+            #     self.fireplace = Fireplace(self, pos=spawner['pos'], size=[48, 48])
         self.scroll = [0,0]
 
 
@@ -177,6 +165,7 @@ class Game:
         while running:
             self.display.fill((0,0,0,0))
             self.display_2.fill((159, 226, 255))
+            dt = self.clock.tick(60) / 1000.0
 
             mpos = self.manager.mouse_position
 
@@ -204,7 +193,7 @@ class Game:
                     pass
 
             if self.location == "home":
-                self.display_2.blit(self.assets['location'], (bg_x - 50, bg_y - 50))
+                self.display_2.blit(self.assets['location'], (bg_x , bg_y ))
             elif self.location in ("suburb", "town"):
                 self.display_2.blit(self.assets['location'], (bg_x, bg_y))
             else:
@@ -212,10 +201,10 @@ class Game:
                 self.display_2.blit(self.assets['location'], (bg_x, bg_y))
 
             self.tile_map.render(self.display, offset=render_scroll)
-
-            if self.is_home:
-                self.fireplace.update(self.tile_map,(0,0))
-                self.fireplace.render(self.display, offset=render_scroll)
+            #
+            # if self.is_home:
+            #     self.fireplace.update(self.tile_map,(0,0))
+            #     self.fireplace.render(self.display, offset=render_scroll)
 
 
             if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible:
@@ -281,11 +270,21 @@ class Game:
                     if event.key == pygame.K_x:
                         if self.clickable:
                             if self.location == "home":
-                                if self.player.pos[0] in range(200, 260) and self.player.pos[1] in range(100,140):
+                                if self.player.pos[0] in range(100, 132) and self.player.pos[1] in range(250,260):
                                     exit_house(self)
-                                elif self.player.pos[0] in range(448, 502) and self.player.pos[1] in range(193,235):
+                                elif self.player.pos[0] in range(10, 80) and self.player.pos[1] in range(177,235):
+                                    if end_life(self):
+                                        PopupPanel.show_message(
+                                            manager=self.manager,
+                                            text="You are dead!",
+                                            screen_size=self.screen.get_size()
+                                        )
+                                        for item in self.menu.save_list:
+                                            item.visible = False
+                                        self.menu.run()
                                     if self.player.energy <= 100:
                                         advance_day(self)
+
                                     else:
                                         PopupPanel.show_message(manager=self.manager,
                                                                 text=f"You are not tired enough",
@@ -361,6 +360,11 @@ class Game:
                     if event.ui_element == self.save_btn:
                         overwrite_save(self.player,self.old_name)
                         self.saved_name = self.player.name
+                        PopupPanel.show_message(
+                            manager=self.manager,
+                            text="Game successfully saved.",
+                            screen_size=self.screen.get_size()
+                        )
 
                     # -----------------------------Action_Buttons ----------------------------- #
 
@@ -595,6 +599,7 @@ class Game:
                             if self.deposit_mode:
                                 try:
                                     self.player.deposit_money(amount=float(self.bank_prompt.text),game=self)
+                                    self.bank_prompt.clear()
                                 except ValueError:
                                     PopupPanel.show_message(
                                         manager=self.manager,
@@ -604,6 +609,7 @@ class Game:
                             elif self.withdraw_mode:
                                 try:
                                     self.player.withdraw_money(amount=float(self.bank_prompt.text),game=self)
+                                    self.bank_prompt.clear()
                                 except ValueError:
                                     PopupPanel.show_message(
                                         manager=self.manager,
@@ -615,7 +621,6 @@ class Game:
                                 continue
 
                 self.manager.process_events(event)
-            dt = self.clock.tick(60)
 
             self.display_2.blit(self.display,(0,0))
 
@@ -625,8 +630,8 @@ class Game:
             self.manager.draw_ui(self.screen)
 
             if self.location == "home":
-                if (self.player.pos[0] in range(200, 260) and self.player.pos[1] in range(100,140) or
-                self.player.pos[0] in range(448, 502) and self.player.pos[1] in range(193,235)):
+                if (self.player.pos[0] in range(100, 132) and self.player.pos[1] in range(250,260) or
+                self.player.pos[0] in range(10, 80) and self.player.pos[1] in range(177,235)):
                     interact()
                 else:
                     self.clickable = False
@@ -652,10 +657,9 @@ class Game:
             self.money_image.render(self.screen)
 
             self.screen.blit(self.assets['cursor'],mpos)
-
+            self.manager.update(dt)
             pygame.display.update()
-            self.manager.update(dt / 1000.0)
-            self.money_animator.update(dt / 1000.0)
-            self.smooth_energy_bar.update(dt / 1000.0)
-            self.smooth_hunger_bar.update(dt / 1000.0)
-            self.smooth_happiness_bar.update(dt / 1000.0)
+            self.money_animator.update(dt)
+            self.smooth_energy_bar.update(dt)
+            self.smooth_hunger_bar.update(dt)
+            self.smooth_happiness_bar.update(dt)

@@ -72,7 +72,7 @@ class Editor:
             bg_x = -int(render_scroll[0])  # 0.5 for slower parallax, use 1 for 1:1 scroll
             bg_y = -int(render_scroll[1])
 
-            self.display.blit(load_image(f'{self.location}.jpg'),(bg_x,bg_y))
+            self.display.blit(load_image(f'{self.location}.png'),(bg_x,bg_y))
             self.tile_map.render(self.display,offset=render_scroll)
             # Preview
             current_tile_img = self.assets[self.tile_list[self.tile_group]][self.tile_variant].copy()
