@@ -55,11 +55,20 @@ class Menu:
             'player/back': Animation(load_images('entities/player/back'), img_dur=6),
         }
 
+        self.assets_sfx = {
+            'ambience' : pygame.mixer.Sound('data/sfx/ambience.wav'),
+            'click' : pygame.mixer.Sound('data/sfx/click.wav'),
+        }
+
+        self.assets_sfx['ambience'].set_volume(0.5)
+        self.assets_sfx['click'].set_volume(0.8)
+
 
     def initialize_save(self,save_id):
         self.prompt_query.visible = False
         self.prompt_cancel.visible = False
         self.player = load_game(player=self.player, name=self.save_list[save_id].text)
+        pygame.mixer.music.stop()
         Game(player=self.player, menu=self)
 
     def delete_menu_save(self,save_id):
@@ -77,6 +86,9 @@ class Menu:
 
 
     def run(self):
+        pygame.mixer.music.load('data/sfx/menu.mp3')
+        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.play(-1)
         self.player = Player(self, (431, 205), (16, 20))
         self.reload_save()
         is_running = True
@@ -116,6 +128,7 @@ class Menu:
                     sys.exit()
 
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                    self.assets_sfx['click'].play()
                     if event.ui_element == self.quit_btn:
                         is_running = False
                         sys.exit()
@@ -206,6 +219,7 @@ class Menu:
                             self.prompt_cancel.visible = False
                             save_game(player=self.player,name=event.text,menu=self)
                             self.player = load_game(player=self.player, name=event.text)
+                            pygame.mixer.music.stop()
                             Game(menu=self,player=self.player)
 
                             is_running = False

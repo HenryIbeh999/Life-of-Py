@@ -32,9 +32,11 @@ class Game:
         self.player.money = round((float(self.player.money)),2)
         self.old_name = self.player.name
         self.saved_name = self.player.name
+        self.player.happiness = 100
+        self.player.energy = 0
         self.player.day = 4
-        self.player.money = 300
-        self.player.energy = 50
+
+
 
         #-----------------------------Indicators ----------------------------- #
         self.location = ""
@@ -50,6 +52,7 @@ class Game:
         self.deposit_mode = False
         self.withdraw_mode = False
         self.is_dead = False
+        self.mute = False
         #-----------------------------Indicators ----------------------------- #
 
 
@@ -70,6 +73,20 @@ class Game:
             "ui_character": load_image(f"ui/ui_character.png"),
 
         }
+
+        self.assets_sfx = {
+            'ambience' : pygame.mixer.Sound('data/sfx/ambience.wav'),
+            'click' : pygame.mixer.Sound('data/sfx/click.wav'),
+            'game_over' : pygame.mixer.Sound('data/sfx/game_over.wav'),
+            'walk' : pygame.mixer.Sound('data/sfx/walk.wav'),
+            'coins' : pygame.mixer.Sound('data/sfx/coins.mp3'),
+            'pause' : pygame.mixer.Sound('data/sfx/pause.mp3'),
+        }
+
+        self.assets_sfx['ambience'].set_volume(0.1)
+        self.assets_sfx['click'].set_volume(0.5)
+
+
 #******************** UI **********************#
 
         self.status_panel = UIPanel(relative_rect=pygame.Rect(0,0, 300, 300),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#status_panel"))
@@ -94,10 +111,10 @@ class Game:
 
         #******************* MISC ****************************#
         self.misc_status_panel = UIPanel(relative_rect=pygame.Rect(50,0,500,80),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#misc_status_panel"),anchors={"centerx":"centerx"})
-        self.pause_btn = UIButton(relative_rect=pygame.Rect(20,0,30,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Pause Game",object_id=ObjectID(class_id="@misc_button",object_id="#pause_button"),anchors={"centery":"centery"})
-        self.sound_btn = UIButton(relative_rect=pygame.Rect(70,0,30,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Mute BG music",object_id=ObjectID(class_id="@misc_button",object_id="#sound_button"),anchors={"centery":"centery"})
+        self.pause_btn = UIButton(relative_rect=pygame.Rect(20,0,30,30),text="",manager=self.manager,container=self.misc_status_panel,object_id=ObjectID(class_id="@misc_button",object_id="#pause_button"),anchors={"centery":"centery"})
+        self.sound_btn = UIButton(relative_rect=pygame.Rect(70,0,30,30),text="",manager=self.manager,container=self.misc_status_panel,object_id=ObjectID(class_id="@misc_button",object_id="#sound_button"),anchors={"centery":"centery"})
         self.day_label = UILabel(relative_rect=pygame.Rect(0, 0, -1, -1), text=f"Day {player.day}", manager=self.manager, container=self.misc_status_panel, object_id=ObjectID(class_id="@text", object_id="#day_text"), anchors={"center": "center"})
-        self.save_btn = UIButton(relative_rect=pygame.Rect(400,0,62,30),text="",manager=self.manager,container=self.misc_status_panel,tool_tip_text="Save Game",object_id=ObjectID(class_id="@misc_button",object_id="#save_button"),anchors={"centery":"centery"})
+        self.save_btn = UIButton(relative_rect=pygame.Rect(400,0,62,30),text="",manager=self.manager,container=self.misc_status_panel,object_id=ObjectID(class_id="@misc_button",object_id="#save_button"),anchors={"centery":"centery"})
         #******************* MISC ****************************#
 
         #******************* PAUSED ****************************#
@@ -162,6 +179,7 @@ class Game:
 
 
     def run(self):
+        self.assets_sfx['ambience'].play(-1)
         circle_transition(self)
         running = True
         while running:
@@ -218,6 +236,8 @@ class Game:
             except AttributeError:
                 self.player_job_label.set_text(f"{self.player.job}")
             self.player_name_label.set_text(f"{self.player.name}")
+            if self.money_animator.current_value != self.player.money:
+                self.assets_sfx['coins'].play()
             self.money_animator.set_target(self.player.money)
             self.smooth_energy_bar.set_value(float(self.player.energy))
             self.day_label.set_text(f"Day {self.player.day}")
@@ -254,16 +274,20 @@ class Game:
                 if event.type == pygame.KEYDOWN:
                     if event.key == pygame.K_d: # Move right
                         self.movement[1] = True
+                        self.assets_sfx['walk'].play(-1)
                         self.movement[1] += 2
                     if event.key == pygame.K_a:  # Move left
                         self.movement[0] = True
+                        self.assets_sfx['walk'].play(-1)
                         self.movement[0] += 2
 
                     if event.key == pygame.K_w: # Move down
                         self.movement[2] = True
+                        self.assets_sfx['walk'].play(-1)
                         self.movement[2] += 2
                     if event.key == pygame.K_s: # Move up
                         self.movement[3] = True
+                        self.assets_sfx['walk'].play(-1)
                         self.movement[3] += 2
                     if event.key == pygame.K_ESCAPE:
                         self.is_paused = not self.is_paused
@@ -277,6 +301,7 @@ class Game:
                                 elif self.player.pos[0] in range(10, 80) and self.player.pos[1] in range(177,235):
                                     self.is_dead = end_life(self)
                                     if self.is_dead:
+                                        self.assets_sfx['game_over'].play()
                                         self.player.energy = 0
                                         self.player.hunger = 0
                                         self.clickable = False
@@ -292,8 +317,8 @@ class Game:
 
                                         else:
                                             PopupPanel.show_message(manager=self.manager,
-                                                                    text=f"You are not tired enough",
-                                                                    screen_size=self.screen.get_size())
+                                                                    text=f"You are not tired enough.",
+                                                                    screen_size=self.screen.get_size(),positive=False)
 
                             elif self.location == "suburb":
                                 if self.player.pos[0] in range(600, 704) and self.player.pos[1] in range(500, 540):
@@ -329,19 +354,26 @@ class Game:
 
 
                 if event.type == pygame.KEYUP:  # Handle key releases
-                    if event.key == pygame.K_d:  # Stop moving left
+                    if event.key == pygame.K_d:  # Stop moving right
                         self.movement[1] = False
-                    if event.key == pygame.K_a:  # Stop moving right
+                        self.assets_sfx['walk'].stop()
+
+                    if event.key == pygame.K_a:  # Stop moving left
                         self.movement[0] = False
+                        self.assets_sfx['walk'].stop()
 
                     if event.key == pygame.K_w:
                         self.movement[2] = False
+                        self.assets_sfx['walk'].stop()
+
                     if event.key == pygame.K_s:
                         self.movement[3] = False
+                        self.assets_sfx['walk'].stop()
 
 
 
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:
+                    self.assets_sfx['click'].play()
                     if event.ui_element == self.pause_btn:
                         if self.is_dead:
                             for item in self.menu.save_list:
@@ -353,6 +385,8 @@ class Game:
 
 
                     if event.ui_element == self.pause_menu_btn:
+                        self.assets_sfx['ambience'].stop()
+                        self.assets_sfx['pause'].stop()
                         for item in self.menu.save_list:
                             item.visible = False
                         self.menu.run()
@@ -551,7 +585,7 @@ class Game:
                                 PopupPanel.show_message(
                                     manager=self.manager,
                                     text="Money Too Low!",
-                                    screen_size=self.screen.get_size()
+                                    screen_size=self.screen.get_size(),positive=False
                                 )
 
                         if self.in_office:
@@ -573,7 +607,7 @@ class Game:
                                 PopupPanel.show_message(
                                     manager=self.manager,
                                     text="Money Too Low!",
-                                    screen_size=self.screen.get_size()
+                                    screen_size=self.screen.get_size(),positive=False
                                 )
                     if event.ui_element == self.change_name_cancel_btn:
                         if self.in_office:
@@ -610,7 +644,7 @@ class Game:
                                     PopupPanel.show_message(
                                         manager=self.manager,
                                         text="Enter an actual number!",
-                                        screen_size=self.screen.get_size()
+                                        screen_size=self.screen.get_size(),positive=False
                                     )
                             elif self.withdraw_mode:
                                 try:
@@ -620,11 +654,30 @@ class Game:
                                     PopupPanel.show_message(
                                         manager=self.manager,
                                         text="Enter an actual number!",
-                                        screen_size=self.screen.get_size()
+                                        screen_size=self.screen.get_size(),positive=False
                                     )
 
                             else:
                                 continue
+
+                    if event.ui_element == self.sound_btn:
+                        self.mute = not self.mute
+                        if self.mute:
+                            PopupPanel.show_message(
+                                manager=self.manager,
+                                text="SFX State: Muted",
+                                screen_size=self.screen.get_size(), positive=False
+                            )
+                            self.assets_sfx['ambience'].set_volume(0.0)
+                            self.assets_sfx['pause'].set_volume(0.0)
+                        else:
+                            PopupPanel.show_message(
+                                manager=self.manager,
+                                text="SFX State: Unmuted",
+                                screen_size=self.screen.get_size(),
+                            )
+                            self.assets_sfx['ambience'].set_volume(0.1)
+                            self.assets_sfx['pause'].set_volume(0.8)
 
                 self.manager.process_events(event)
 

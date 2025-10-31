@@ -1,6 +1,7 @@
 import pygame
 
 class MoneyAnimator:
+    """Majority of code written by ChatGPT"""
     def __init__(self, label, base_color=(0, 0, 0)):
         self.label = label
         self.base_color = pygame.Color(*base_color)

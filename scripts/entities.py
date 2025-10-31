@@ -113,14 +113,14 @@ class Player(PhysicsEntity):
             PopupPanel.show_message(
                 manager=game.manager,
                 text="You are tired, get some sleep!",
-                screen_size=game.screen.get_size()
+                screen_size=game.screen.get_size(),positive=False
             )
 
         elif self.hunger <= 0:
             PopupPanel.show_message(
                 manager=game.manager,
                 text="You look really hungry, bro!",
-                screen_size=game.screen.get_size()
+                screen_size=game.screen.get_size(),positive=False
             )
 
 
@@ -146,7 +146,7 @@ class Player(PhysicsEntity):
             PopupPanel.show_message(
                 manager=game.manager,
                 text="Insufficient funds!",
-                screen_size=game.screen.get_size()
+                screen_size=game.screen.get_size(),positive=False
             )
 
     def withdraw_money(self,amount,game):
@@ -162,7 +162,7 @@ class Player(PhysicsEntity):
             PopupPanel.show_message(
                 manager=game.manager,
                 text=f"You're not that rich, yet!",
-                screen_size=game.screen.get_size()
+                screen_size=game.screen.get_size(),positive=False
             )
 
 

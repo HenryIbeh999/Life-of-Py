@@ -164,6 +164,8 @@ def set_panel_text(game):
 
 def pause(game):
     if game.is_paused is True:
+        game.assets_sfx['ambience'].stop()
+        game.assets_sfx['pause'].play(-1)
         game.is_action_panel = False
         game.action_panel.visible = False
         game.small_action_panel.visible = False
@@ -190,6 +192,8 @@ def pause(game):
         game.credit_sub_3_label.visible = True
 
     else:
+        game.assets_sfx['pause'].stop()
+        game.assets_sfx['ambience'].play(-1)
         game.pause_panel.visible = False
         game.pause_load_btn.visible = False
         game.pause_menu_btn.visible = False
@@ -323,7 +327,7 @@ def end_life(game):
         PopupPanel.show_message(
             manager=game.manager,
             text="You really need a health checkup!",
-            screen_size=game.screen.get_size()
+            screen_size=game.screen.get_size(), positive=False
         )
         return False
 
@@ -377,15 +381,15 @@ def tax_player(game):
         if game.player.deposit < 200:
             return
         else:
-            taxable_income = (game.player.deposit * 10)/100
+            taxable_income = round(((game.player.deposit * 10)/100),2)
             game.player.deposit -= taxable_income
             PopupPanel.show_message(manager=game.manager,
                                     text=f"It's tax time, ${taxable_income} has been taken.",
-                                    screen_size=game.screen.get_size())
+                                    screen_size=game.screen.get_size(),positive=False)
 
     else:
-        taxable_income = (game.player.money * 10) / 100
+        taxable_income = round(((game.player.money * 10) / 100), 2)
         game.player.money -= taxable_income
         PopupPanel.show_message(manager=game.manager,
                                 text=f"It's tax time, ${taxable_income} has been taken from you.",
-                                screen_size=game.screen.get_size())
+                                screen_size=game.screen.get_size(),positive=False)

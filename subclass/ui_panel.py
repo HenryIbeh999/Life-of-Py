@@ -9,6 +9,9 @@ class AnimatedPanel(UIPanel):
         self.anim_alpha = None
 
     def slide_to(self, new_pos, duration=1.0, easing=pytweening.easeOutCubic):
+        pygame.mixer.music.load('data/sfx/rollover.wav')
+        pygame.mixer.music.set_volume(0.8)
+        pygame.mixer.music.play()
         start_x, start_y = self.rect.topleft
         end_x, end_y = new_pos
         self.anim_x = TweenAnimation(start_x, end_x, duration, easing)
