@@ -70,15 +70,13 @@ class TileMap:
                 if loc in self.tile_map:
                     tile = self.tile_map[loc]
                     if tile['type'] in ['stone']:  # Add all solid types
-                        rects.append(pygame.Rect(tile['pos'][0] * self.tile_size, tile['pos'][1] * self.tile_size,
-                                                 self.tile_size - 15, self.tile_size - 15))
+                        rects.append(pygame.Rect(tile['pos'][0] * self.tile_size + 10,tile['pos'][1] * self.tile_size,
+                                                1, 1))
         # Off-grid/large tiles
 
         for tile in self.off_grid_tiles:
-            # building
             if tile['type'] in ['stone']:  # Add all solid types
-                rects.append(pygame.Rect(tile['pos'][0], tile['pos'][1] - 10,
-                                         8, 1))
+                rects.append(pygame.Rect(tile['pos'][0], tile['pos'][1], 1, 1))
         return rects
 
 

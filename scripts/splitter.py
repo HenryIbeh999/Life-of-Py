@@ -38,9 +38,9 @@ def extract_objects(image_path, output_dir):
     os.makedirs(output_dir, exist_ok=True)
     for i, box in enumerate(objects):
         cropped = img.crop(box)
-        cropped.save(os.path.join(output_dir, f"object_{i}.png"))
+        cropped.save(os.path.join(output_dir, f"{i}.png"))
 
     print(f"Extracted {len(objects)} objects into {output_dir}")
 
 # Example usage
-extract_objects("keyboard buttons.png", "KeySample UI pack")
+extract_objects("home.png", "home")

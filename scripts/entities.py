@@ -18,7 +18,7 @@ class PhysicsEntity:
         self.action = ''
         self.anim_offset = (-3, -3)
         self.flip = False
-        self.set_action('idle')
+        self.set_action('front_idle')
 
 
 
@@ -82,31 +82,46 @@ class Player(PhysicsEntity):
         super().__init__(game,'player', pos, size)
         self.name = ""
         self.money = round(0.0,2)
-        self.happiness = 100.0
+        self.health = 100.0
         self.energy = 100.0
         self.hunger = 100.0
         self.job = None
         self.deposit = round(0.0,2)
         self.day = 1
+        self.last_movement = None
+        self.is_dead = False
 
     def update(self,tile_map, movement=(0, 0)):
         super().update(tile_map,movement=movement)
         if movement[0] > 0:
-            self.flip = True
-            self.set_action('left')
-        elif movement[0] < 0:
             self.flip = False
             self.set_action('left')
+            self.last_movement = 'left'
+        elif movement[0] < 0:
+            self.flip = True
+            self.set_action('left')
+            self.last_movement = 'left'
         elif movement[1] > 0:
             self.set_action('front')
+            self.last_movement = 'front'
         elif movement[1] <0:
             self.set_action('back')
+            self.last_movement = 'back'
+
         else:
-            self.set_action('idle')
+            if self.is_dead:
+                self.set_action('hurt')
+            elif self.last_movement in ('front','left'):
+                self.set_action('front_idle')
+            elif self.last_movement in ('back','left'):
+                self.set_action('back_idle')
 
     def render(self, surf, offset=(0,0)):
         super().render(surf,offset=offset)
 
+    def die(self):
+        if self.is_dead:
+            return True
 
     def work(self,game):
         if self.energy < self.job.energy_cost:

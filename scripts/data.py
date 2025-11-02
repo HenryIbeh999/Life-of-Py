@@ -17,7 +17,7 @@ class Player(Base):
     id: Mapped[int] = mapped_column(primary_key=True)
     name: Mapped[str] = mapped_column(String(30),unique=True)
     money: Mapped[float] = mapped_column(Float)
-    happiness: Mapped[int]
+    health: Mapped[int]
     energy : Mapped[int]
     hunger : Mapped[int]
     job : Mapped[str] = mapped_column(String(50),nullable=True)
@@ -33,7 +33,7 @@ def save_game(player,name,menu):
     new_save = Player(
         name = player.name,
         money = player.money,
-        happiness = player.happiness,
+        health = player.health,
         energy = player.energy,
         hunger = player.hunger,
         job = player.job.name if player.job else None,
@@ -55,7 +55,7 @@ def overwrite_save(player,old_name):
     new_save = Player(
         name = player.name,
         money = player.money,
-        happiness = player.happiness,
+        health = player.health,
         energy = player.energy,
         hunger = player.hunger,
         job = player.job.name if player.job else None,
@@ -77,7 +77,7 @@ def load_game(player,name):
         if row:
             player.name = row.name,
             player.money = row.money
-            player.happiness = row.happiness
+            player.health = row.health
             player.energy = row.energy
             player.hunger = row.hunger
             player.job = next((j for j in jobs if j.name == row.job), None)

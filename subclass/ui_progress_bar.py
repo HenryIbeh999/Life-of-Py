@@ -6,11 +6,9 @@ class SmoothProgressBar:
         self.speed = speed
 
     def set_value(self, value):
-        """Set a new target percentage (0.0–1.0)."""
         self.target = max(0.0, min(100.0, value))
 
     def update(self, dt):
-        """Ease toward target smoothly."""
         diff = self.target - self.current
         if abs(diff) < 0.001:
             return

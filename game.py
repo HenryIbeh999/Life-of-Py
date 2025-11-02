@@ -32,9 +32,7 @@ class Game:
         self.player.money = round((float(self.player.money)),2)
         self.old_name = self.player.name
         self.saved_name = self.player.name
-        self.player.happiness = 100
-        self.player.energy = 0
-        self.player.day = 4
+
 
 
 
@@ -51,13 +49,11 @@ class Game:
         self.in_bank = False
         self.deposit_mode = False
         self.withdraw_mode = False
-        self.is_dead = False
         self.mute = False
         #-----------------------------Indicators ----------------------------- #
 
-
         if self.is_home:
-            self.location = "town"
+            self.location = "home"
 
 
         self.assets = {
@@ -66,7 +62,7 @@ class Game:
             'item/coin' : Animation(load_images('coins')),
             'job' : load_image('ui/job.png'),
             'energy' : load_image('ui/energy.png'),
-            'happiness' : load_image('ui/happiness.png'),
+            'health' : load_image('ui/health.png'),
             'hunger' : load_image('ui/hunger.png'),
             'x_button' : load_image('ui/x_button.png'),
             "cursor": load_image("cursor/cursor.png"),
@@ -83,8 +79,8 @@ class Game:
             'pause' : pygame.mixer.Sound('data/sfx/pause.mp3'),
         }
 
-        self.assets_sfx['ambience'].set_volume(0.1)
-        self.assets_sfx['click'].set_volume(0.5)
+        self.assets_sfx['ambience'].set_volume(0)
+        self.assets_sfx['click'].set_volume(0)
 
 
 #******************** UI **********************#
@@ -105,9 +101,9 @@ class Game:
         self.hunger_image = UIImage(relative_rect=pygame.Rect(20,140,28,28),image_surface=self.assets['hunger'],manager=self.manager,container=self.status_panel)
         self.hunger_bar = UIProgressBar(relative_rect=pygame.Rect(48,140,180,27),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#hunger_bar"))
         self.smooth_hunger_bar = SmoothProgressBar(self.hunger_bar)
-        self.happiness_image = UIImage(relative_rect=pygame.Rect(20,180,28,28),image_surface=self.assets['happiness'],manager=self.manager,container=self.status_panel)
-        self.happiness_bar = UIProgressBar(relative_rect=pygame.Rect(48,180,180,27),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#happiness_bar"))
-        self.smooth_happiness_bar = SmoothProgressBar(self.happiness_bar)
+        self.health_image = UIImage(relative_rect=pygame.Rect(20,180,28,28),image_surface=self.assets['health'],manager=self.manager,container=self.status_panel)
+        self.health_bar = UIProgressBar(relative_rect=pygame.Rect(48,180,180,27),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#health_bar"))
+        self.smooth_health_bar = SmoothProgressBar(self.health_bar)
 
         #******************* MISC ****************************#
         self.misc_status_panel = UIPanel(relative_rect=pygame.Rect(50,0,500,80),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#misc_status_panel"),anchors={"centerx":"centerx"})
@@ -183,10 +179,7 @@ class Game:
         circle_transition(self)
         running = True
         while running:
-            if self.is_dead:
-                self.display.fill((0,0,0))
-            else:
-                self.display.fill((0, 0, 0, 0))
+            self.display.fill((0, 0, 0, 0))
 
             self.display_2.fill((159, 226, 255))
             dt = self.clock.tick(60) / 1000.0
@@ -210,7 +203,7 @@ class Game:
             screen_y = int(player_y * self.screen.get_height() / self.display.get_height())
 
             def interact():
-                if self.is_action_panel is False and self.is_paused is False and not self.pause_panel.visible and not self.is_dead:
+                if self.is_action_panel is False and self.is_paused is False and not self.pause_panel.visible and not self.player.is_dead:
                     self.clickable = True
                     self.screen.blit(self.assets["x_button"], (screen_x - 5, screen_y - 60))
                 else:
@@ -227,8 +220,12 @@ class Game:
             self.tile_map.render(self.display, offset=render_scroll)
 
 
-            if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible and not self.is_dead:
-                self.player.update(self.tile_map, (self.movement[1] - self.movement[0], self.movement[3]- self.movement[2]))
+
+            if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible:
+                if not self.player.is_dead:
+                    self.player.update(self.tile_map, (self.movement[1] - self.movement[0], self.movement[3]- self.movement[2]))
+                else:
+                    self.player.update(self.tile_map,(0,0))
                 self.player.render(self.display, offset=render_scroll)
 
             try:
@@ -237,7 +234,7 @@ class Game:
                 self.player_job_label.set_text(f"{self.player.job}")
             self.player_name_label.set_text(f"{self.player.name}")
             if self.money_animator.current_value != self.player.money:
-                self.assets_sfx['coins'].play()
+                self.assets_sfx['coins'].play(0)
             self.money_animator.set_target(self.player.money)
             self.smooth_energy_bar.set_value(float(self.player.energy))
             self.day_label.set_text(f"Day {self.player.day}")
@@ -246,11 +243,11 @@ class Game:
             else:
                 self.energy_bar.change_object_id("@high_progress_bar")
 
-            self.smooth_happiness_bar.set_value(float(self.player.happiness))
-            if self.player.happiness <= 30.0:
-                self.happiness_bar.change_object_id("@low_progress_bar")
+            self.smooth_health_bar.set_value(float(self.player.health))
+            if self.player.health <= 30.0:
+                self.health_bar.change_object_id("@low_progress_bar")
             else:
-                self.happiness_bar.change_object_id("@high_progress_bar")
+                self.health_bar.change_object_id("@high_progress_bar")
             self.smooth_hunger_bar.set_value(float(self.player.hunger))
             if self.player.hunger <= 30.0:
                 self.hunger_bar.change_object_id("@low_progress_bar")
@@ -298,12 +295,9 @@ class Game:
                             if self.location == "home":
                                 if self.player.pos[0] in range(100, 132) and self.player.pos[1] in range(250,260):
                                     exit_house(self)
-                                elif self.player.pos[0] in range(10, 80) and self.player.pos[1] in range(177,235):
-                                    self.is_dead = end_life(self)
-                                    if self.is_dead:
+                                elif self.player.pos[0] in range(10, 90) and self.player.pos[1] in range(177,235):
+                                    if end_life(self):
                                         self.assets_sfx['game_over'].play()
-                                        self.player.energy = 0
-                                        self.player.hunger = 0
                                         self.clickable = False
                                         self.save_btn.disable()
                                         self.save_btn.hide()
@@ -326,7 +320,7 @@ class Game:
                                 elif self.player.pos[0] in range(240, 270) and self.player.pos[1] in range(230, 250):
                                     enter_house(self)
                             elif self.location == "town":
-                                if self.player.pos[0] in range(-15, 0) and self.player.pos[1] in range(163, 277):
+                                if self.player.pos[0] in range(-15, 10) and self.player.pos[1] in range(163, 277):
                                     exit_town(self)
 
                                 # DRUG STORE TRIGGER
@@ -375,7 +369,7 @@ class Game:
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:
                     self.assets_sfx['click'].play()
                     if event.ui_element == self.pause_btn:
-                        if self.is_dead:
+                        if self.player.is_dead:
                             for item in self.menu.save_list:
                                 item.visible = False
                                 self.menu.run()
@@ -395,6 +389,11 @@ class Game:
                         pause(self)
                         self.player= load_game(player=self.player,name=self.saved_name)
                         self.player.name = self.player.name[0]
+                        PopupPanel.show_message(
+                            manager=self.manager,
+                            text="Current session loaded.",
+                            screen_size=self.screen.get_size()
+                        )
 
 
                     if event.ui_element == self.save_btn:
@@ -402,7 +401,7 @@ class Game:
                         self.saved_name = self.player.name
                         PopupPanel.show_message(
                             manager=self.manager,
-                            text="Game successfully saved.",
+                            text="Current session successfully saved.",
                             screen_size=self.screen.get_size()
                         )
 
@@ -565,9 +564,9 @@ class Game:
                         # -----------Medical_Action_Buttons----------- #
                         if self.in_drug_store:
                             if self.player.money >= 20:
-                                self.player.happiness += 20
+                                self.player.health += 25
                                 self.player.money -= 20
-                                self.player.happiness = min(self.player.happiness,100)
+                                self.player.health = min(self.player.health,100)
                             else:
                                 PopupPanel.show_message(
                                     manager=self.manager,
@@ -690,7 +689,7 @@ class Game:
 
             if self.location == "home":
                 if (self.player.pos[0] in range(100, 132) and self.player.pos[1] in range(250,260) or
-                self.player.pos[0] in range(10, 80) and self.player.pos[1] in range(177,235)):
+                self.player.pos[0] in range(10, 90) and self.player.pos[1] in range(190,235)):
                     interact()
                 else:
                     self.clickable = False
@@ -707,7 +706,7 @@ class Game:
                     self.player.pos[0] in range(225, 272) and self.player.pos[1] in range(161,170) or
                     self.player.pos[0] in range(449, 485) and self.player.pos[1] in range(481,490) or
                     self.player.pos[0] in range(65, 130) and self.player.pos[1] in range(481,500) or
-                    self.player.pos[0] in range(-15, 0) and self.player.pos[1] in range(163, 277)
+                    self.player.pos[0] in range(-15, 10) and self.player.pos[1] in range(163, 277)
                     ) :
                     interact()
                 else:
@@ -721,4 +720,4 @@ class Game:
             self.money_animator.update(dt)
             self.smooth_energy_bar.update(dt)
             self.smooth_hunger_bar.update(dt)
-            self.smooth_happiness_bar.update(dt)
+            self.smooth_health_bar.update(dt)

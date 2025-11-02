@@ -49,10 +49,12 @@ class Menu:
             "cursor": load_image("cursor/cursor.png"),
             'stone': load_images('tiles/stone'),
             'save': load_image('ui/save.png'),
-            'player/idle': Animation(load_images('entities/player/idle'), img_dur=6),
+            'player/front_idle': Animation(load_images('entities/player/front_idle'), img_dur=12),
+            'player/back_idle': Animation(load_images('entities/player/back_idle'), img_dur=12),
             'player/front': Animation(load_images('entities/player/front'), img_dur=6),
             'player/left': Animation(load_images('entities/player/left'), img_dur=6),
             'player/back': Animation(load_images('entities/player/back'), img_dur=6),
+            'player/hurt': Animation(load_images('entities/player/hurt'), img_dur=6,loop=False),
         }
 
         self.assets_sfx = {
@@ -87,9 +89,9 @@ class Menu:
 
     def run(self):
         pygame.mixer.music.load('data/sfx/menu.mp3')
-        pygame.mixer.music.set_volume(0.5)
+        pygame.mixer.music.set_volume(0)
         pygame.mixer.music.play(-1)
-        self.player = Player(self, (431, 205), (16, 20))
+        self.player = Player(self, (431, 205), (20, 36))
         self.reload_save()
         is_running = True
         while is_running:
