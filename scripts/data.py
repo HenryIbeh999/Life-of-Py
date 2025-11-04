@@ -23,6 +23,7 @@ class Player(Base):
     job : Mapped[str] = mapped_column(String(50),nullable=True)
     deposit : Mapped[float] = mapped_column(Float)
     day : Mapped[int]
+    gender: Mapped[int]
 
 
 Base.metadata.create_all(engine)
@@ -38,7 +39,8 @@ def save_game(player,name,menu):
         hunger = player.hunger,
         job = player.job.name if player.job else None,
         deposit=player.deposit,
-        day = player.day
+        day = player.day,
+        gender = player.gender
     )
 
     with Session(engine) as session:
@@ -60,7 +62,8 @@ def overwrite_save(player,old_name):
         hunger = player.hunger,
         job = player.job.name if player.job else None,
         deposit = player.deposit,
-        day = player.day
+        day = player.day,
+        gender=player.gender
     )
 
     with Session(engine) as session:
@@ -83,6 +86,7 @@ def load_game(player,name):
             player.job = next((j for j in jobs if j.name == row.job), None)
             player.deposit = row.deposit
             player.day = row.day
+            player.gender = row.gender
             return player
         return None
 

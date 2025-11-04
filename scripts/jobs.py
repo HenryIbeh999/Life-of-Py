@@ -3,7 +3,7 @@ class Job:
         self.name = name
         self.salary = float(salary)
         self.energy_cost = energy_cost
-        self.happiness_cost = 20
+        self.health_cost = 20
 
 
 def load_jobs():

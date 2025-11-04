@@ -270,7 +270,11 @@ def circle_transition(game, duration=1000):
         game.display_2.blit(mask, (0, 0))
 
         # Draw to screen
-        game.screen.blit(pygame.transform.scale(game.display_2, game.screen.get_size()), (200, 0))
+        if game.is_home:
+            game.screen.blit(pygame.transform.scale(game.display_2, game.screen.get_size()), (200, 0))
+        else:
+            game.screen.blit(pygame.transform.scale(game.display_2, game.screen.get_size()), (0, 0))
+
 
         pygame.display.update()
 
@@ -337,12 +341,11 @@ def end_life(game):
         return False
 
     elif game.player.health == 0:
-        # game.display.fill((0,0,0))
 
-        dead_label = UILabel(relative_rect=(0,0,-1,-1), anchors={"center":"center"},
+        dead_label = UILabel(relative_rect=(0,200,-1,-1), anchors={"center":"center"},
                              text="YOU ARE DEAD!!!",manager=game.manager,object_id=ObjectID("@label","#dead_label"),visible=False)
-        small_dead_label = UILabel(relative_rect=(0,80,-1,-1), anchors={"center":"center"},
-                             text="Try to be happy next time:)",manager=game.manager,object_id=ObjectID("@label","#small_dead_label"),visible=False)
+        small_dead_label = UILabel(relative_rect=(0,280,-1,-1), anchors={"center":"center"},
+                             text="Try to be happy next time :)",manager=game.manager,object_id=ObjectID("@label","#small_dead_label"),visible=False)
         dead_label.visible = True
         small_dead_label.visible = True
         game.player.is_dead = True

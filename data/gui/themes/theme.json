@@ -415,5 +415,22 @@
       "shape_corner_radius": "7",
       "border_width": "1"
     }
+  },
+
+  "@check_box": {
+    "colours": {
+      "normal_bg": "#95b190cb,#93e98cdc,270",
+      "hovered_bg": "#95b190cb",
+      "hovered_border": "#000",
+      "selected_bg": "#95b190cb,#93e98cdc,270",
+      "selected_border": "#000",
+      "selected_text": "#000",
+      "normal_border": "#000"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "17",
+      "border_width": "2"
+    }
   }
 }

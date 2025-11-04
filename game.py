@@ -32,6 +32,7 @@ class Game:
         self.player.money = round((float(self.player.money)),2)
         self.old_name = self.player.name
         self.saved_name = self.player.name
+        self.player.health = 0
 
 
 
@@ -269,26 +270,27 @@ class Game:
                     pygame.quit()
                     sys.exit()
                 if event.type == pygame.KEYDOWN:
-                    if event.key == pygame.K_d: # Move right
-                        self.movement[1] = True
-                        self.assets_sfx['walk'].play(-1)
-                        self.movement[1] += 2
-                    if event.key == pygame.K_a:  # Move left
-                        self.movement[0] = True
-                        self.assets_sfx['walk'].play(-1)
-                        self.movement[0] += 2
+                    if not self.player.is_dead:
+                        if event.key == pygame.K_d: # Move right
+                            self.movement[1] = True
+                            self.assets_sfx['walk'].play(-1)
+                            self.movement[1] += 2
+                        if event.key == pygame.K_a:  # Move left
+                            self.movement[0] = True
+                            self.assets_sfx['walk'].play(-1)
+                            self.movement[0] += 2
 
-                    if event.key == pygame.K_w: # Move down
-                        self.movement[2] = True
-                        self.assets_sfx['walk'].play(-1)
-                        self.movement[2] += 2
-                    if event.key == pygame.K_s: # Move up
-                        self.movement[3] = True
-                        self.assets_sfx['walk'].play(-1)
-                        self.movement[3] += 2
-                    if event.key == pygame.K_ESCAPE:
-                        self.is_paused = not self.is_paused
-                        pause(self)
+                        if event.key == pygame.K_w: # Move down
+                            self.movement[2] = True
+                            self.assets_sfx['walk'].play(-1)
+                            self.movement[2] += 2
+                        if event.key == pygame.K_s: # Move up
+                            self.movement[3] = True
+                            self.assets_sfx['walk'].play(-1)
+                            self.movement[3] += 2
+                        if event.key == pygame.K_ESCAPE:
+                            self.is_paused = not self.is_paused
+                            pause(self)
 
                     if event.key == pygame.K_x:
                         if self.clickable:
