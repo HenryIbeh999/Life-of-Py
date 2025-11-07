@@ -28,11 +28,9 @@ class Game:
         self.manager = pygame_gui.UIManager((1024, 768), theme_path="data/gui/themes/theme.json")
         self.player = player
         self.menu = menu
-        self.player.name = self.player.name[0]
-        self.player.money = round((float(self.player.money)),2)
         self.old_name = self.player.name
         self.saved_name = self.player.name
-        self.player.health = 0
+        self.player.energy = 0
 
 
 
@@ -51,6 +49,7 @@ class Game:
         self.deposit_mode = False
         self.withdraw_mode = False
         self.mute = False
+        self.is_night = False
         #-----------------------------Indicators ----------------------------- #
 
         if self.is_home:
@@ -80,8 +79,8 @@ class Game:
             'pause' : pygame.mixer.Sound('data/sfx/pause.mp3'),
         }
 
-        self.assets_sfx['ambience'].set_volume(0)
-        self.assets_sfx['click'].set_volume(0)
+        self.assets_sfx['ambience'].set_volume(0.2)
+        self.assets_sfx['click'].set_volume(1.0)
 
 
 #******************** UI **********************#
@@ -155,10 +154,6 @@ class Game:
 
 #******************** UI **********************#
 
-        # ******************** ENTITIES **********************#
-
-        # ******************** ENTITIES **********************#
-
         self.tile_map =TileMap(self,tile_size=16)
         self.load_map(self.location)
         self.run()
@@ -178,12 +173,20 @@ class Game:
     def run(self):
         self.assets_sfx['ambience'].play(-1)
         circle_transition(self)
+        if self.player.gender == 0:
+            self.player.set_action('male/front_idle')
+        else:
+            self.player.set_action('female/front_idle')
+
         running = True
         while running:
-            self.display.fill((0, 0, 0, 0))
-
-            self.display_2.fill((159, 226, 255))
             dt = self.clock.tick(60) / 1000.0
+            check_time(self)
+            self.display.fill((0, 0, 0, 0))
+            if self.is_night:
+                self.display_2.fill((45, 38, 43))
+            else:
+                self.display_2.fill((159, 226, 255))
 
             mpos = self.manager.mouse_position
 
@@ -206,17 +209,17 @@ class Game:
             def interact():
                 if self.is_action_panel is False and self.is_paused is False and not self.pause_panel.visible and not self.player.is_dead:
                     self.clickable = True
-                    self.screen.blit(self.assets["x_button"], (screen_x - 5, screen_y - 60))
+                    self.screen.blit(self.assets["x_button"], (screen_x - 20, screen_y - 80))
                 else:
                     pass
 
-            if self.location == "home":
-                self.display_2.blit(self.assets['location'], (bg_x , bg_y ))
-            elif self.location in ("suburb", "town"):
-                self.display_2.blit(self.assets['location'], (bg_x, bg_y))
-            else:
-                # fallback: draw the location at (0,0) so nothing weird happens
-                self.display_2.blit(self.assets['location'], (bg_x, bg_y))
+            if self.location in ('home','suburb','town'):
+                if self.pause_panel.visible or self.action_panel.visible:
+                    self.display_2.blit(pygame.transform.gaussian_blur( self.assets['location'],radius=1),(bg_x, bg_y))
+                else:
+                    self.money_image.update(self.tile_map)
+                    self.display_2.blit(self.assets['location'], (bg_x , bg_y ))
+
 
             self.tile_map.render(self.display, offset=render_scroll)
 
@@ -296,7 +299,7 @@ class Game:
                         if self.clickable:
                             if self.location == "home":
                                 if self.player.pos[0] in range(100, 132) and self.player.pos[1] in range(250,260):
-                                    exit_house(self)
+                                    change_location(self,'suburb')
                                 elif self.player.pos[0] in range(10, 90) and self.player.pos[1] in range(177,235):
                                     if end_life(self):
                                         self.assets_sfx['game_over'].play()
@@ -318,12 +321,12 @@ class Game:
 
                             elif self.location == "suburb":
                                 if self.player.pos[0] in range(600, 704) and self.player.pos[1] in range(500, 540):
-                                    exit_suburb(self)
+                                    change_location(self,'town')
                                 elif self.player.pos[0] in range(240, 270) and self.player.pos[1] in range(230, 250):
-                                    enter_house(self)
+                                    change_location(self,'home')
                             elif self.location == "town":
                                 if self.player.pos[0] in range(-15, 10) and self.player.pos[1] in range(163, 277):
-                                    exit_town(self)
+                                    change_location(self,'suburb')
 
                                 # DRUG STORE TRIGGER
                                 if self.player.pos[0] in range(49, 85) and self.player.pos[1] in range(150, 165):
@@ -373,7 +376,7 @@ class Game:
                     if event.ui_element == self.pause_btn:
                         if self.player.is_dead:
                             for item in self.menu.save_list:
-                                item.visible = False
+                                item.visible = True
                                 self.menu.run()
                         else:
                             self.is_paused = not self.is_paused
@@ -573,7 +576,7 @@ class Game:
                                 PopupPanel.show_message(
                                     manager=self.manager,
                                     text="You can't afford healthcare!",
-                                    screen_size=self.screen.get_size()
+                                    screen_size=self.screen.get_size(),positive=False
                                 )
 
                         # -----------Burger_Shop_Action_Buttons----------- #
@@ -585,7 +588,7 @@ class Game:
                             else:
                                 PopupPanel.show_message(
                                     manager=self.manager,
-                                    text="Money Too Low!",
+                                    text="You can't afford a Burger!",
                                     screen_size=self.screen.get_size(),positive=False
                                 )
 
@@ -607,7 +610,7 @@ class Game:
                             else:
                                 PopupPanel.show_message(
                                     manager=self.manager,
-                                    text="Money Too Low!",
+                                    text="You can't afford a Pizza!",
                                     screen_size=self.screen.get_size(),positive=False
                                 )
                     if event.ui_element == self.change_name_cancel_btn:
@@ -678,7 +681,7 @@ class Game:
                                 screen_size=self.screen.get_size(),
                             )
                             self.assets_sfx['ambience'].set_volume(0.1)
-                            self.assets_sfx['pause'].set_volume(0.8)
+                            self.assets_sfx['pause'].set_volume(0.2)
 
                 self.manager.process_events(event)
 
@@ -713,7 +716,6 @@ class Game:
                     interact()
                 else:
                     self.clickable = False
-            self.money_image.update(self.tile_map)
             self.money_image.render(self.screen)
 
             self.screen.blit(self.assets['cursor'],mpos)

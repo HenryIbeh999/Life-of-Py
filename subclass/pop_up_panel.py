@@ -15,10 +15,10 @@ class PopupPanel(UIPanel):
 
     def __init__(self, manager, text, screen_size,
                  duration=2000, fade_time=400,
-                 width=500, height=80,
+                 width=700, height=80,
                  slide_speed=400):
         screen_w, screen_h = screen_size
-        base_x = screen_w - width - 265
+        base_x = screen_w - width - 150
         base_y = screen_h - height - 20
         start_y = base_y + 100  # start slightly below screen for animation
 
@@ -56,7 +56,7 @@ class PopupPanel(UIPanel):
             container=self,
             object_id=ObjectID(class_id="@label", object_id="#popup_label")
         )
-        self.label.set_active_effect(pygame_gui.TEXT_EFFECT_TYPING_APPEAR)
+        # self.label.set_active_effect(pygame_gui.TEXT_EFFECT_TYPING_APPEAR)
 
         # Kill previous popup if exists
         if PopupPanel.active_popup:
@@ -66,6 +66,7 @@ class PopupPanel(UIPanel):
 
     @staticmethod
     def show_message(manager, text, screen_size, duration=4000, fade_time=400,positive= True):
+        """Shows or updates the popup with new text."""
         if positive:
             pygame.mixer.music.load('data/sfx/notice.wav')
             pygame.mixer.music.set_volume(0.8)
@@ -74,7 +75,6 @@ class PopupPanel(UIPanel):
             pygame.mixer.music.load('data/sfx/negative_notice.mp3')
             pygame.mixer.music.set_volume(0.8)
             pygame.mixer.music.play()
-        """Shows or updates the popup with new text."""
         if PopupPanel.active_popup:
             popup = PopupPanel.active_popup
             popup.text = text

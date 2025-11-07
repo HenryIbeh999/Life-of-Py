@@ -172,7 +172,7 @@ class Player(PhysicsEntity):
         elif self.hunger <= 0:
             PopupPanel.show_message(
                 manager=game.manager,
-                text="You look really hungry, bro!",
+                text="You look really hungry!",
                 screen_size=game.screen.get_size(),positive=False
             )
 

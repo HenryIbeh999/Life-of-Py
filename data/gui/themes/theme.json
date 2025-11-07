@@ -416,8 +416,7 @@
       "border_width": "1"
     }
   },
-
-  "@check_box": {
+  "#check": {
     "colours": {
       "normal_bg": "#95b190cb,#93e98cdc,270",
       "hovered_bg": "#95b190cb",
@@ -427,10 +426,16 @@
       "selected_text": "#000",
       "normal_border": "#000"
     },
+
     "misc": {
       "shape": "rounded_rectangle",
       "shape_corner_radius": "17",
-      "border_width": "2"
+      "border_width": "2",
+      "shadow_width": "2",
+      "check_symbol": "✓",
+      "indeterminate_symbol": "−",
+      "text_offset": "8",
+      "tool_tip_delay": "1.5"
     }
   }
 }

@@ -34,8 +34,8 @@ class Menu:
         self.prompt_query = UITextEntryLine(relative_rect=pygame.Rect(0, 40, 600, 40), manager=self.manager,placeholder_text="Enter a name here", anchors={'centerx': 'centerx'},object_id=ObjectID(class_id="@input", object_id="#new_save_input"),visible=False)
         self.prompt_cancel = UIButton(relative_rect=pygame.Rect(95, 40, 100,40),text='Cancel',manager=self.manager,object_id = ObjectID(class_id='@small_button', object_id='#prompt_cancel_button'),visible=False)
         self.prompt_confirm = UIButton(relative_rect=pygame.Rect(830, 40, 100,40),text='Start',manager=self.manager,object_id = ObjectID(class_id='@small_button', object_id='#prompt_start_button'),visible=False)
-        self.male_check = UICheckBox(relative_rect=pygame.Rect(220, 100, 40,40),text='Male',manager=self.manager,object_id = ObjectID(class_id='@check_box', object_id='#male_check'),visible=False)
-        self.female_check = UICheckBox(relative_rect=pygame.Rect(320, 100, 40,40),text='Female',manager=self.manager,object_id = ObjectID(class_id='@check_box', object_id='#female_check'),visible=False)
+        self.male_check = UICheckBox(relative_rect=pygame.Rect(220, 100, 40,40),text='Male',manager=self.manager,object_id = ObjectID(class_id='@check_box', object_id='#check'),visible=False)
+        self.female_check = UICheckBox(relative_rect=pygame.Rect(320, 100, 40,40),text='Female',manager=self.manager,object_id = ObjectID(class_id='@check_box', object_id='#check'),visible=False)
 
         self.new_save_btn = UIButton(relative_rect=pygame.Rect(0,30, 200, 50),text='New Game',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@small_button', object_id='#new_save_button'),container=self.menu_panel)
         self.load_btn = UIButton(relative_rect=pygame.Rect(0,100, 200, 50),text='Load',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@small_button', object_id='#load_button'),container=self.menu_panel)
@@ -74,10 +74,12 @@ class Menu:
         self.assets_sfx = {
             'ambience' : pygame.mixer.Sound('data/sfx/ambience.wav'),
             'click' : pygame.mixer.Sound('data/sfx/click.wav'),
+            'hard_click' : pygame.mixer.Sound('data/sfx/hard_click.wav'),
         }
 
         self.assets_sfx['ambience'].set_volume(0.5)
         self.assets_sfx['click'].set_volume(0.8)
+        self.assets_sfx['hard_click'].set_volume(0.8)
 
 
     def initialize_save(self,save_id):
@@ -107,26 +109,54 @@ class Menu:
             pass
         return None
 
+    def show_save_buttons(self):
+        for item in self.save_list:
+            try:
+                item.show()
+            except Exception:
+                # fallback if element doesn't implement show()
+                try:
+                    item.visible = True
+                except Exception:
+                    pass
+
+    def hide_save_buttons(self):
+        for item in self.save_list:
+            try:
+                item.hide()
+            except Exception:
+                try:
+                    item.visible = False
+                except Exception:
+                    pass
+
     def reload_save(self):
+        # remove any existing UI elements returned by previous query_save
+        if hasattr(self, 'save_list'):
+            for item in list(self.save_list):
+                try:
+                    item.kill()
+                except Exception:
+                    try:
+                        item.hide()
+                    except Exception:
+                        pass
+        # recreate save buttons
         self.is_save_panel = False
         self.save_list = query_save(self)
-        try:
-            for i in range(3):
-                self.save_list[i].set_text(query_save(self)[i].text)
-        except IndexError:
-            pass
+        self.hide_save_buttons()
 
 
 
     def run(self):
         pygame.mixer.music.load('data/sfx/menu.mp3')
-        pygame.mixer.music.set_volume(0)
+        pygame.mixer.music.set_volume(0.6)
         pygame.mixer.music.play(-1)
-        time_delta = self.clock.tick(60) / 1000.0
         self.player = Player(self, (431, 205), (20, 36))
         self.reload_save()
         is_running = True
         while is_running:
+            time_delta = self.clock.tick(60) / 1000.0
             pygame.mouse.set_visible(False)
             self.background.blit(self.assets['menu'],(0,0))
             mpos = self.manager.mouse_position
@@ -138,10 +168,14 @@ class Menu:
                 self.delete_btn.hide()
                 self.quit_btn.hide()
                 self.extra_label.hide()
+                self.prompt_query.hide()
+                self.prompt_cancel.hide()
+                self.prompt_confirm.hide()
+                self.male_check.hide()
+                self.female_check.hide()
                 self.load_panel.show()
                 self.back_btn.show()
-                for item in self.save_list:
-                    item.show()
+                self.show_save_buttons()
             else:
                 self.menu_panel.show()
                 self.new_save_btn.show()
@@ -151,9 +185,7 @@ class Menu:
                 self.extra_label.show()
                 self.load_panel.hide()
                 self.back_btn.hide()
-                for item in self.save_list:
-                    item.hide()
-
+                self.hide_save_buttons()
 
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -193,20 +225,27 @@ class Menu:
                     if event.ui_element == self.delete_btn:
                         self.is_save_panel = True
                         for item in self.save_list:
-                            item.show()
+                            item.visible = True
                         self.load_mode = False
                         self.delete_mode = True
 
                     #*********** DELETE **********#
                     if self.delete_mode:
                         idx = self._get_save_index(event.ui_element)
-                        if idx is not None:
-                            try:
-                                self.save_list[idx].hide()
+                        try:
+                            if idx is not None:
                                 self.delete_menu_save(idx)
-                                self.save_list.pop(idx)
-                            except IndexError:
-                                pass
+                                # remove/destroy the UI element so it disappears immediately
+                                btn = self.save_list.pop(idx)
+                                try:
+                                    btn.kill()
+                                except Exception:
+                                    try:
+                                        btn.hide()
+                                    except Exception:
+                                        pass
+                        except Exception as e:
+                            print(e)
 
                     if event.ui_element == self.back_btn:
                         self.is_save_panel = False
@@ -219,22 +258,22 @@ class Menu:
                         self.load_panel.hide()
                         self.back_btn.hide()
                         for item in self.save_list:
-                            item.hide()
+                            item.visible= False
 
                     if event.ui_element == self.prompt_confirm:
                         if len(self.prompt_query.text) > 4:
                             if self.male_check.is_checked or self.female_check.is_checked:
-                                save_game(player=self.player,name=self.prompt_query.text,menu=self)
-                                self.player = load_game(player=self.player, name=self.prompt_query.text)
-                                self.prompt_query.clear()
-                                self.prompt_query.hide()
-                                self.prompt_cancel.hide()
-                                self.prompt_confirm.hide()
-                                self.male_check.hide()
-                                self.female_check.hide()
-                                pygame.mixer.music.stop()
-                                Game(menu=self,player=self.player)
-                                is_running = False
+                                if save_game(player=self.player,name=self.prompt_query.text,menu=self):
+                                    self.player = load_game(player=self.player, name=self.prompt_query.text)
+                                    self.prompt_query.clear()
+                                    self.prompt_query.hide()
+                                    self.prompt_cancel.hide()
+                                    self.prompt_confirm.hide()
+                                    self.male_check.hide()
+                                    self.female_check.hide()
+                                    pygame.mixer.music.stop()
+                                    Game(menu=self,player=self.player)
+                                    is_running = False
                             else:
                                 PopupPanel.show_message(manager=self.manager, text="Confirm the gender of your character!",
                                                         screen_size=self.window_surface.get_size(), positive=False)
@@ -247,6 +286,7 @@ class Menu:
 
 
                 if event.type == pygame_gui.UI_CHECK_BOX_CHECKED:
+                    self.assets_sfx['hard_click'].play()
                     if event.ui_element == self.male_check:
                         self.female_check.set_state(False)
                         self.player.gender = 0
@@ -254,7 +294,7 @@ class Menu:
                     elif event.ui_element == self.female_check:
                         self.male_check.set_state(False)
                         self.player.gender = 1
-                        
+
 
 
                 self.manager.process_events(event)

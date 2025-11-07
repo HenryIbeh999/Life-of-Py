@@ -15,7 +15,7 @@ class Base(DeclarativeBase):
 class Player(Base):
     __tablename__ = "player_table"
     id: Mapped[int] = mapped_column(primary_key=True)
-    name: Mapped[str] = mapped_column(String(30),unique=True)
+    name: Mapped[str] = mapped_column(String(30))
     money: Mapped[float] = mapped_column(Float)
     health: Mapped[int]
     energy : Mapped[int]
@@ -23,7 +23,7 @@ class Player(Base):
     job : Mapped[str] = mapped_column(String(50),nullable=True)
     deposit : Mapped[float] = mapped_column(Float)
     day : Mapped[int]
-    gender: Mapped[int]
+    gender: Mapped[int] = mapped_column(nullable=True)
 
 
 Base.metadata.create_all(engine)
@@ -31,26 +31,42 @@ Base.metadata.create_all(engine)
 def save_game(player,name,menu):
     if player.name == "":
         player.name = name
-    new_save = Player(
-        name = player.name,
-        money = player.money,
-        health = player.health,
-        energy = player.energy,
-        hunger = player.hunger,
-        job = player.job.name if player.job else None,
-        deposit=player.deposit,
-        day = player.day,
-        gender = player.gender
-    )
-
     with Session(engine) as session:
-        session.execute(delete(Player).where(Player.name==player.name))
-        session.commit()
+        existing = session.scalar(select(Player).where(Player.name == player.name))
         try:
-            session.add(new_save)
-            session.commit()
-        except IntegrityError:
-            PopupPanel.show_message(manager=menu.manager, text="Save name already exist!",screen_size=menu.screen.get_size())
+            if existing.name == name:
+                PopupPanel.show_message(
+                    manager=menu.manager,
+                    text="Save Name Already Exists.",
+                    screen_size=menu.window_surface.get_size(),
+                    positive=False
+                )
+                return False
+        except AttributeError:
+            if existing:
+                PopupPanel.show_message(
+                    manager=menu.manager,
+                    text="Save Name Already Exists.",
+                    screen_size=menu.window_surface.get_size(),
+                    positive=False
+                )
+                return False
+        new_save = Player(
+            name = player.name,
+            money = player.money,
+            health = player.health,
+            energy = player.energy,
+            hunger = player.hunger,
+            job = player.job.name if player.job else None,
+            deposit=player.deposit,
+            day = player.day,
+            gender = player.gender
+        )
+        session.add(new_save)
+        session.commit()
+        return True
+
+
 
 
 def overwrite_save(player,old_name):
@@ -74,11 +90,10 @@ def overwrite_save(player,old_name):
 
 def load_game(player,name):
     with Session(engine) as session:
-        loaded_save = session.execute(select(Player).where(Player.name==name))
-        row = loaded_save.scalar()
+        row = session.scalar(select(Player).where(Player.name == name))
         jobs = load_jobs()
         if row:
-            player.name = row.name,
+            player.name = row.name
             player.money = row.money
             player.health = row.health
             player.energy = row.energy
@@ -109,7 +124,7 @@ def query_save(menu):
                                           manager=menu.manager, anchors={'centerx': 'centerx'},
                                           object_id=ObjectID(class_id='@small_button', object_id='#menu_load_button'),
                                           container=menu.load_panel))
-            return save_list[:3]
+            return save_list
 
     except FileNotFoundError:
         return None

@@ -208,7 +208,11 @@ def pause(game):
 def exit_house(game):
     game.is_home = False
     game.location = "suburb"
-    game.assets['location'] = load_image(f'{game.location}.png')
+    if game.player.energy <= 30:
+        game.assets['location'] = load_image(f'night_{game.location}.jpg')
+    else:
+        game.assets['location'] = load_image(f'{game.location}.png')
+
 
     game.load_map(game.location)
 
@@ -217,7 +221,10 @@ def exit_house(game):
 
 def exit_suburb(game):
     game.location = "town"
-    game.assets['location'] = load_image(f'{game.location}.png')
+    if game.player.energy <= 30:
+        game.assets['location'] = load_image(f'night_{game.location}.jpg')
+    else:
+        game.assets['location'] = load_image(f'{game.location}.png')
 
     game.load_map(game.location)
 
@@ -225,22 +232,40 @@ def exit_suburb(game):
 
 def exit_town(game):
     game.location = "suburb"
-    game.assets['location'] = load_image(f'{game.location}.png')
+    if game.player.energy <= 30:
+        game.assets['location'] = load_image(f'night_{game.location}.jpg')
+    else:
+        game.assets['location'] = load_image(f'{game.location}.png')
 
     game.load_map(game.location)
 
     circle_transition(game)
 
-def enter_house(game):
-    game.is_home = True
-    game.location = "home"
+def change_location(game,location):
+    game.location = location
+    if location == "home":
+        game.is_home = True
     game.assets['location'] = load_image(f'{game.location}.png')
-
     game.load_map(game.location)
 
     circle_transition(game)
+
+
+def check_time(game):
+    if game.player.energy <= 30:
+        game.is_night = True
+        if game.is_night:
+            if game.location == 'home':
+                game.assets['location'] = load_image(f'night_{game.location}.png')
+            else:
+                game.assets['location'] = load_image(f'night_{game.location}.jpg')
+
+    elif game.player.energy > 30:
+        game.is_night = False
+        game.assets['location'] = load_image(f'{game.location}.png')
 
 def circle_transition(game, duration=1000):
+    check_time(game)
     center = (game.display_2.get_width() // 2, game.display_2.get_height() // 2)
     max_radius = int((game.display_2.get_width() ** 2 + game.display_2.get_height() ** 2) ** 0.5)
     start_time = pygame.time.get_ticks()
@@ -255,8 +280,15 @@ def circle_transition(game, duration=1000):
 
         # Draw game scene
         game.display.fill((0, 0, 0, 0))
-        game.display_2.fill((159, 226, 255))
-        game.display_2.blit(game.assets['location'], (0,0))
+        if game.is_night:
+            game.display_2.fill((45, 38, 43))
+        else:
+            game.display_2.fill((159, 226, 255))
+        if game.location == 'home':
+            game.display_2.blit(game.assets['location'], (100,0))
+        else:
+            game.display_2.blit(game.assets['location'], (0,0))
+
         game.tile_map.render(game.display, offset=(0, 0))
         game.player.render(game.display, offset=(0, 0))
 
@@ -268,12 +300,7 @@ def circle_transition(game, duration=1000):
 
 
         game.display_2.blit(mask, (0, 0))
-
-        # Draw to screen
-        if game.is_home:
-            game.screen.blit(pygame.transform.scale(game.display_2, game.screen.get_size()), (200, 0))
-        else:
-            game.screen.blit(pygame.transform.scale(game.display_2, game.screen.get_size()), (0, 0))
+        game.screen.blit(pygame.transform.scale(game.display_2, game.screen.get_size()), (0, 0))
 
 
         pygame.display.update()
@@ -312,16 +339,19 @@ def set_transaction_type(game):
 def gain_interest(game):
     rate = 0.4
     principal = game.player.deposit
-    day = game.player.day
+    if game.player.deposit == 0:
+        day= 1
+    else:
+        day = game.player.day
     interest = round(float((principal * rate * day)/100),2)
 
     return interest
 
 
 def advance_day(game):
-    circle_transition(game)
     game.player.energy = 100.0
     game.player.day += 1
+    circle_transition(game)
 
     if game.player.day % 2 == 0:
         if game.player.deposit > 0:
@@ -342,9 +372,9 @@ def end_life(game):
 
     elif game.player.health == 0:
 
-        dead_label = UILabel(relative_rect=(0,200,-1,-1), anchors={"center":"center"},
+        dead_label = UILabel(relative_rect=(0,250,-1,-1), anchors={"center":"center"},
                              text="YOU ARE DEAD!!!",manager=game.manager,object_id=ObjectID("@label","#dead_label"),visible=False)
-        small_dead_label = UILabel(relative_rect=(0,280,-1,-1), anchors={"center":"center"},
+        small_dead_label = UILabel(relative_rect=(0,330,-1,-1), anchors={"center":"center"},
                              text="Try to be happy next time :)",manager=game.manager,object_id=ObjectID("@label","#small_dead_label"),visible=False)
         dead_label.visible = True
         small_dead_label.visible = True

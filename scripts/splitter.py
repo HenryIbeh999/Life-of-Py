@@ -43,4 +43,4 @@ def extract_objects(image_path, output_dir):
     print(f"Extracted {len(objects)} objects into {output_dir}")
 
 # Example usage
-extract_objects("idle.png", "player")
+extract_objects("run.png", "player")
