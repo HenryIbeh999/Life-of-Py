@@ -202,6 +202,16 @@
       }
     }
   },
+  "#rate_button": {
+    "images": {
+      "normal_image": {
+        "path": "./data/images/ui/rate.png"
+      },
+      "hovered_image": {
+        "path": "./data/images/ui/hovered_rate.png"
+      }
+    }
+  },
   "@panel": {
     "colours": {
       "dark_bg": "#95b190cb,#93e98cdc,270",
@@ -250,6 +260,16 @@
     "colours": {
       "dark_bg": "#95b190cb,#93e98cdc,270",
       "normal_border": "Black"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "20",
+      "border_width": "1"
+    }
+  },
+  "#chart_panel": {
+    "colours": {
+      "dark_bg": "#95b190cb,#a6e279da,270"
     },
     "misc": {
       "shape": "rounded_rectangle",
@@ -426,7 +446,6 @@
       "selected_text": "#000",
       "normal_border": "#000"
     },
-
     "misc": {
       "shape": "rounded_rectangle",
       "shape_corner_radius": "17",

@@ -4,10 +4,14 @@ import pygame
 from pygame_gui.core import ObjectID
 from sqlalchemy import *
 from sqlalchemy.orm import *
-from sqlalchemy.exc import IntegrityError
 from subclass.pop_up_panel import PopupPanel
+from pathlib import Path
+from sqlalchemy import create_engine
 
-engine = create_engine("sqlite+pysqlite:///save.db")
+db_path = Path(__file__).resolve().parents[1] / "data" / "save" / "save.db"
+db_path.parent.mkdir(parents=True, exist_ok=True)
+
+engine = create_engine(f"sqlite+pysqlite:///{db_path.as_posix()}", future=True)
 
 class Base(DeclarativeBase):
     pass
@@ -24,9 +28,12 @@ class Player(Base):
     deposit : Mapped[float] = mapped_column(Float)
     day : Mapped[int]
     gender: Mapped[int] = mapped_column(nullable=True)
+    level: Mapped[int]
 
-
-Base.metadata.create_all(engine)
+try:
+    Base.metadata.create_all(engine)
+except Exception as e:
+    raise RuntimeError(f"Could not open or create database at {db_path}: {e}") from e
 
 def save_game(player,name,menu):
     if player.name == "":
@@ -34,7 +41,7 @@ def save_game(player,name,menu):
     with Session(engine) as session:
         existing = session.scalar(select(Player).where(Player.name == player.name))
         try:
-            if existing.name == name:
+            if existing.name.split()[0] == name.split()[0]:
                 PopupPanel.show_message(
                     manager=menu.manager,
                     text="Save Name Already Exists.",
@@ -60,7 +67,8 @@ def save_game(player,name,menu):
             job = player.job.name if player.job else None,
             deposit=player.deposit,
             day = player.day,
-            gender = player.gender
+            gender = player.gender,
+            level = player.level
         )
         session.add(new_save)
         session.commit()
@@ -79,7 +87,8 @@ def overwrite_save(player,old_name):
         job = player.job.name if player.job else None,
         deposit = player.deposit,
         day = player.day,
-        gender=player.gender
+        gender=player.gender,
+        level=player.level
     )
 
     with Session(engine) as session:
@@ -102,6 +111,7 @@ def load_game(player,name):
             player.deposit = row.deposit
             player.day = row.day
             player.gender = row.gender
+            player.level = row.level
             return player
         return None
 

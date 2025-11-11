@@ -7,6 +7,8 @@ from scripts.utils import load_image
 import pytweening
 import pygame
 from subclass.pop_up_panel import PopupPanel
+from scripts.economy import *
+from scripts.jobs import load_jobs
 
 def show_action(game, primary_action_type, secondary_action_type):
     if game.is_action_panel is True:
@@ -21,6 +23,7 @@ def show_action(game, primary_action_type, secondary_action_type):
         game.secondary_job_label.visible = True
         game.primary_action_button.visible = True
         game.primary_action_label.visible = True
+        game.rate_btn.disable()
 
 
 
@@ -38,7 +41,6 @@ def show_action(game, primary_action_type, secondary_action_type):
             game.in_office = False
             game.in_bank = False
             set_panel_text(game)
-            game.primary_action_label.set_text("Health check-up")
 
 
         if primary_action_type == "cook" and secondary_action_type == "cashier":
@@ -103,62 +105,72 @@ def show_action(game, primary_action_type, secondary_action_type):
         game.primary_action_label.visible = False
         game.secondary_action_button.visible = False
         game.secondary_action_label.visible = False
+        game.rate_btn.enable()
+
 
 def set_panel_text(game):
     if game.in_drug_store:
+        medical_salary = round(load_jobs()[5].base_salary * game.economy.salary_index,2)
+        sales_salary = round(load_jobs()[1].base_salary * game.economy.salary_index,2)
         if game.player.job is None:
-            game.primary_job_label.set_text("Work in the Medical field")
-            game.secondary_job_label.set_text("Work in the Sales field")
+            game.primary_job_label.set_text(f"Work in the Medical field - ${medical_salary}")
+            game.secondary_job_label.set_text(f"Work in the Sales field - ${sales_salary}")
         elif game.player.job.name != "Doctor" and game.player.job.name != "Salesman":
-            game.primary_job_label.set_text("Work in the Medical field")
-            game.secondary_job_label.set_text("Work in the Sales field")
+            game.primary_job_label.set_text(f"Work in the Medical field - ${medical_salary}")
+            game.secondary_job_label.set_text(f"Work in the Sales field - ${sales_salary}")
         elif game.player.job.name == "Doctor":
-            game.primary_job_label.set_text(f"Work as a Doctor")
-            game.secondary_job_label.set_text("Work in the Sales field")
+            game.primary_job_label.set_text(f"Work as a Doctor - ${medical_salary}")
+            game.secondary_job_label.set_text(f"Work in the Sales field - ${sales_salary}")
         elif game.player.job.name == "Salesman":
-            game.primary_job_label.set_text("Work in the Medical field")
-            game.secondary_job_label.set_text("Work as a Salesman")
-
+            game.primary_job_label.set_text(f"Work in the Medical field - ${medical_salary}")
+            game.secondary_job_label.set_text(f"Work as a Salesman - ${sales_salary}")
+        game.primary_action_label.set_text(f"Health check-up - ${round((((20 * game.economy.inflation) / 10) + 20),2)}")
 
     if game.in_burgershop:
+        cook_salary = round(load_jobs()[6].base_salary * game.economy.salary_index,2)
+        cashier_salary = round(load_jobs()[0].base_salary * game.economy.salary_index,2)
         if game.player.job is None:
-            game.primary_job_label.set_text(f"Work in the Culinary field")
-            game.secondary_job_label.set_text("Work in the Cashier field")
+            game.primary_job_label.set_text(f"Work in the Culinary field - ${cook_salary}")
+            game.secondary_job_label.set_text(f"Work in the Cashier field - ${cashier_salary}")
 
         elif game.player.job.name != "Cook" and game.player.job.name != "Cashier":
-            game.primary_job_label.set_text(f"Work in the Culinary field")
-            game.secondary_job_label.set_text("Work in the Cashier field")
+            game.primary_job_label.set_text(f"Work in the Culinary field - ${cook_salary}")
+            game.secondary_job_label.set_text(f"Work in the Cashier field - ${cashier_salary}")
         elif game.player.job.name == "Cook":
-            game.primary_job_label.set_text("Work as a Cook")
-            game.secondary_job_label.set_text("Work in the Cashier field")
+            game.primary_job_label.set_text(f"Work as a Cook - ${cook_salary}")
+            game.secondary_job_label.set_text(f"Work in the Cashier field - ${cashier_salary}")
         elif game.player.job.name == "Cashier":
-            game.primary_job_label.set_text("Work in the Culinary field")
-            game.secondary_job_label.set_text("Work as a Cashier")
-        game.primary_action_label.set_text("Order a Burger Meal")
-        game.secondary_action_label.set_text("Order a Pizza")
+            game.primary_job_label.set_text(f"Work in the Culinary field - ${cook_salary}")
+            game.secondary_job_label.set_text(f"Work as a Cashier - ${cashier_salary}")
+        game.primary_action_label.set_text(f"Order a Burger Meal - ${round((((20 * game.economy.inflation) / 10) + 20),2)}")
+        game.secondary_action_label.set_text(f"Order a Pizza - ${round((((35 * game.economy.inflation) / 10) + 35),2)}")
 
     if game.in_office:
+        programmer_salary = round(load_jobs()[4].base_salary * game.economy.salary_index,2)
+        clerk_salary = round(load_jobs()[2].base_salary * game.economy.salary_index,2)
         if game.player.job is None:
-            game.primary_job_label.set_text(f"Work in the Tech field")
-            game.secondary_job_label.set_text("Work in the Reception field")
+            game.primary_job_label.set_text(f"Work in the Tech field - ${programmer_salary}")
+            game.secondary_job_label.set_text(f"Work in the Reception field - ${clerk_salary}")
         elif game.player.job.name != "Programmer" and game.player.job.name != "Clerk":
-            game.primary_job_label.set_text(f"Work in the Tech field")
-            game.secondary_job_label.set_text("Work in the Reception field")
+            game.primary_job_label.set_text(f"Work in the Tech field - ${programmer_salary}")
+            game.secondary_job_label.set_text(f"Work in the Reception field - ${clerk_salary}")
         elif game.player.job.name == "Programmer":
-            game.primary_job_label.set_text("Work as a Programmer")
-            game.secondary_job_label.set_text("Work in the Reception field")
+            game.primary_job_label.set_text(f"Work as a Programmer - ${programmer_salary}")
+            game.secondary_job_label.set_text(f"Work in the Reception field - ${clerk_salary}")
         elif game.player.job.name == "Clerk":
-            game.primary_job_label.set_text("Work in the Tech field")
-            game.secondary_job_label.set_text("Work as a Clerk")
+            game.primary_job_label.set_text(f"Work in the Tech field - ${programmer_salary}")
+            game.secondary_job_label.set_text(f"Work as a Clerk - ${clerk_salary}")
         game.primary_action_label.set_text("Change your name")
 
     if game.in_bank:
+        accountant_salary = round(load_jobs()[3].base_salary * game.economy.salary_index,2)
+
         if game.player.job is None:
-            game.primary_job_label.set_text(f"Work in the Financial field")
+            game.primary_job_label.set_text(f"Work in the Financial field - ${accountant_salary}")
         elif game.player.job.name != "Accountant":
-            game.primary_job_label.set_text(f"Work in the Financial field")
+            game.primary_job_label.set_text(f"Work in the Financial field - ${accountant_salary}")
         elif game.player.job.name == "Accountant":
-            game.primary_job_label.set_text("Work as an Accountant")
+            game.primary_job_label.set_text(f"Work as an Accountant - ${accountant_salary}")
         game.secondary_job_label.set_text("Deposit Money")
         game.primary_action_label.set_text("Withdraw Money")
 
@@ -183,6 +195,12 @@ def pause(game):
         game.change_name_panel.visible = False
         game.change_name_prompt.visible = False
         game.change_name_cancel_btn.visible = False
+        game.is_rate_panel = False
+        game.chart_panel.visible = False
+        game.chart_image.visible = False
+        game.chart_cancel_btn.visible = False
+        game.rate_btn.disable()
+
 
         game.pause_panel.visible = True
         game.pause_panel.slide_to((0, 0), duration=1.0, easing=pytweening.easeOutBack)
@@ -203,6 +221,8 @@ def pause(game):
         game.credit_sub_1_label.visible = False
         game.credit_sub_2_label.visible = False
         game.credit_sub_3_label.visible = False
+        game.rate_btn.enable()
+
 
 
 def exit_house(game):
@@ -290,7 +310,6 @@ def circle_transition(game, duration=1000):
             game.display_2.blit(game.assets['location'], (0,0))
 
         game.tile_map.render(game.display, offset=(0, 0))
-        game.player.render(game.display, offset=(0, 0))
 
         # Create transition mask
         mask = pygame.Surface(game.display_2.get_size(), pygame.SRCALPHA)
@@ -337,7 +356,7 @@ def set_transaction_type(game):
         game.max_type_label.visible = True
 
 def gain_interest(game):
-    rate = 0.4
+    rate = game.economy.interest_rate
     principal = game.player.deposit
     if game.player.deposit == 0:
         day= 1
@@ -347,10 +366,29 @@ def gain_interest(game):
 
     return interest
 
+def init_chart(game):
+    if game.is_rate_panel:
+        game.chart_panel.show()
+        game.chart_panel.slide_to((100, 0), duration=1.0, easing=pytweening.easeOutBack)
+        game.chart_image.set_image(show_graph(game))
+        game.chart_image.show()
+        game.chart_cancel_btn.show()
+    else:
+        game.chart_panel.hide()
+        game.chart_image.hide()
+        game.chart_cancel_btn.hide()
+
 
 def advance_day(game):
-    game.player.energy = 100.0
+    # game.player.energy = 100.0
     game.player.day += 1
+    game.is_rate_panel = False
+    game.chart_panel.hide()
+    game.chart_image.hide()
+    game.chart_cancel_btn.hide()
+    advance_economy(game)
+    save_economy(game)
+    update_csv(game)
     circle_transition(game)
 
     if game.player.day % 2 == 0:
@@ -389,14 +427,14 @@ def tax_player(game):
         if game.player.deposit < 200:
             return
         else:
-            taxable_income = round(((game.player.deposit * 10)/100),2)
+            taxable_income = round(((game.player.deposit * game.economy.tax_rate)/30),2)
             game.player.deposit -= taxable_income
             PopupPanel.show_message(manager=game.manager,
                                     text=f"It's tax time, ${taxable_income} has been taken away from you.",
                                     screen_size=game.screen.get_size(),positive=False)
 
     else:
-        taxable_income = round(((game.player.money * 10) / 100), 2)
+        taxable_income = round(((game.player.money * game.economy.tax_rate) / 30), 2)
         game.player.money -= taxable_income
         PopupPanel.show_message(manager=game.manager,
                                 text=f"It's tax time, ${taxable_income} has been taken away from you.",

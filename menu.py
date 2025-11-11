@@ -8,8 +8,10 @@ from scripts.utils import load_images, load_image
 from scripts.entities import Player
 from scripts.data import save_game,load_game,delete_save, query_save
 from scripts.utils import Animation, load_images, load_image
+from scripts.economy import delete_economy
 from game import Game
 from subclass.pop_up_panel import PopupPanel
+import os
 
 
 class Menu:
@@ -93,6 +95,8 @@ class Menu:
         Game(player=self.player, menu=self)
 
     def delete_menu_save(self,save_id):
+        delete_economy(name=self.save_list[save_id].text)
+        os.remove(f'data/save/{self.save_list[save_id].text.split()[0]}_economy.csv')
         delete_save(name=self.save_list[save_id].text)
 
     def _get_save_index(self, ui_element):
@@ -150,7 +154,7 @@ class Menu:
 
     def run(self):
         pygame.mixer.music.load('data/sfx/menu.mp3')
-        pygame.mixer.music.set_volume(0.6)
+        pygame.mixer.music.set_volume(0)
         pygame.mixer.music.play(-1)
         self.player = Player(self, (431, 205), (20, 36))
         self.reload_save()
@@ -235,7 +239,7 @@ class Menu:
                         try:
                             if idx is not None:
                                 self.delete_menu_save(idx)
-                                # remove/destroy the UI element so it disappears immediately
+
                                 btn = self.save_list.pop(idx)
                                 try:
                                     btn.kill()

@@ -6,7 +6,11 @@
 
 
 #Database files
-save.db
+data/save/save.db
+data/save/economy.db
+
+#CSV file
+*.csv
 ### Also any macOS specific files
 .DS_Store
 .AppleDouble

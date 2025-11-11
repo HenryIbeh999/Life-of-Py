@@ -87,6 +87,7 @@ class Player(PhysicsEntity):
         self.last_movement = None
         self.is_dead = False
         self.gender = None
+        self.level = 1
 
 
     def update(self,tile_map, movement=(0, 0)):
@@ -161,6 +162,17 @@ class Player(PhysicsEntity):
         if self.is_dead:
             return True
 
+    def check_lvl(self,game,job):
+        if self.level < job.lvl_required:
+            PopupPanel.show_message(
+                manager=game.manager,
+                text=f"You need to be at LVL {job.lvl_required} to get this job",
+                screen_size=game.screen.get_size(),positive=False
+            )
+            return False
+        else:
+            return True
+
     def work(self,game):
         if self.energy < self.job.energy_cost:
             PopupPanel.show_message(
@@ -177,8 +189,11 @@ class Player(PhysicsEntity):
             )
 
 
+
+
+
         else:
-            self.money += self.job.salary
+            self.money += self.job.base_salary * game.economy.salary_index
             self.energy -= self.job.energy_cost
             self.energy = max(self.energy,0)
             self.hunger -= 25

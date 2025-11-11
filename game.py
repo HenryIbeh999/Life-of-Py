@@ -14,6 +14,7 @@ from subclass.ui_panel import AnimatedPanel
 from subclass.pop_up_panel import PopupPanel
 from subclass.ui_label import MoneyAnimator
 from subclass.ui_progress_bar import SmoothProgressBar
+from scripts.economy import *
 
 class Game:
     def __init__(self,menu,player):
@@ -31,6 +32,7 @@ class Game:
         self.old_name = self.player.name
         self.saved_name = self.player.name
         self.player.energy = 0
+        self.economy = load_economy(self)
 
 
 
@@ -40,6 +42,7 @@ class Game:
         self.is_paused = False
         self.is_action_panel = False
         self.is_change_name_panel = False
+        self.is_rate_panel = False
         self.is_home = True
         self.clickable = False
         self.in_drug_store = False
@@ -104,6 +107,8 @@ class Game:
         self.health_image = UIImage(relative_rect=pygame.Rect(20,180,28,28),image_surface=self.assets['health'],manager=self.manager,container=self.status_panel)
         self.health_bar = UIProgressBar(relative_rect=pygame.Rect(48,180,180,27),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#health_bar"))
         self.smooth_health_bar = SmoothProgressBar(self.health_bar)
+        self.rate_btn = UIButton(relative_rect=pygame.Rect(0,250,62,30),text="",manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@misc_button",object_id="#rate_button"),anchors={"centerx":"centerx"})
+
 
         #******************* MISC ****************************#
         self.misc_status_panel = UIPanel(relative_rect=pygame.Rect(50,0,500,80),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#misc_status_panel"),anchors={"centerx":"centerx"})
@@ -152,6 +157,11 @@ class Game:
         self.bank_continue_btn = UIButton(relative_rect=pygame.Rect(0,120,94,30),text="",manager=self.manager, anchors={"centerx": "centerx"},container=self.bank_panel,object_id=ObjectID(class_id="@misc_button",object_id="#continue_button"))
         #*******************ACTIONS SECTION********************#
 
+        self.chart_panel = AnimatedPanel(relative_rect=pygame.Rect(0,0,600,600),manager=self.manager,anchors={'center': 'center'},object_id=ObjectID(class_id="@panel", object_id="#chart_panel"),visible=False)
+        self.chart_image = UIImage(relative_rect=pygame.Rect(0,0,550,500),manager=self.manager,image_surface=None,anchors={'center': 'center'},container=self.chart_panel)
+        self.chart_cancel_btn = UIButton(relative_rect=pygame.Rect(20,10,30,30),text="",manager=self.manager,container=self.chart_panel,object_id=ObjectID(class_id="@misc_button",object_id="#cancel_button"))
+
+
 #******************** UI **********************#
 
         self.tile_map =TileMap(self,tile_size=16)
@@ -173,11 +183,15 @@ class Game:
     def run(self):
         self.assets_sfx['ambience'].play(-1)
         circle_transition(self)
+        if self.player.day ==1:
+            save_economy(self)
+            self.economy = load_economy(self)
+            update_csv(self)
+
         if self.player.gender == 0:
             self.player.set_action('male/front_idle')
         else:
             self.player.set_action('female/front_idle')
-
         running = True
         while running:
             dt = self.clock.tick(60) / 1000.0
@@ -207,14 +221,14 @@ class Game:
             screen_y = int(player_y * self.screen.get_height() / self.display.get_height())
 
             def interact():
-                if self.is_action_panel is False and self.is_paused is False and not self.pause_panel.visible and not self.player.is_dead:
+                if self.is_action_panel is False and self.is_paused is False and not self.pause_panel.visible and not self.player.is_dead and self.is_rate_panel is False:
                     self.clickable = True
                     self.screen.blit(self.assets["x_button"], (screen_x - 20, screen_y - 80))
                 else:
                     pass
 
             if self.location in ('home','suburb','town'):
-                if self.pause_panel.visible or self.action_panel.visible:
+                if self.pause_panel.visible or self.action_panel.visible or self.chart_panel.visible:
                     self.display_2.blit(pygame.transform.gaussian_blur( self.assets['location'],radius=1),(bg_x, bg_y))
                 else:
                     self.money_image.update(self.tile_map)
@@ -225,7 +239,7 @@ class Game:
 
 
 
-            if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible:
+            if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible and not self.chart_panel.visible:
                 if not self.player.is_dead:
                     self.player.update(self.tile_map, (self.movement[1] - self.movement[0], self.movement[3]- self.movement[2]))
                 else:
@@ -409,88 +423,100 @@ class Game:
                             text="Current session successfully saved.",
                             screen_size=self.screen.get_size()
                         )
+                    if event.ui_element == self.rate_btn:
+                        if not self.is_paused:
+                            self.is_rate_panel = not self.is_rate_panel
+                            init_chart(self)
+
 
                     # -----------------------------Action_Buttons ----------------------------- #
 
                     if event.ui_element == self.primary_job_button:
                         # -----------Medical_Action_Buttons----------- #
                         if self.in_drug_store:
-                            if self.player.job is None:
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Doctor!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[5]
-                            elif self.player.job.name !="Doctor":
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Doctor!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[5]
-                            else:
-                                self.player.work(self)
-                            set_panel_text(self)
+                            if self.player.check_lvl(self,load_jobs()[5]):
+                                if self.player.job is None:
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Doctor!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[5]
+                                elif self.player.job.name !="Doctor":
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Doctor!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[5]
+                                else:
+                                    self.player.work(self)
+                                set_panel_text(self,load_jobs()[5])
 
                         # -----------Burger_Shop_Action_Buttons----------- #
                         if self.in_burgershop:
-                            if self.player.job is None:
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Cook!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[6]
-                            elif self.player.job.name !="Cook":
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Cook!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[6]
-                            else:
-                                self.player.work(self)
-                            set_panel_text(self)
+                            if self.player.check_lvl(self,load_jobs()[6]):
+
+                                if self.player.job is None:
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Cook!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[6]
+                                elif self.player.job.name !="Cook":
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Cook!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[6]
+                                else:
+                                    self.player.work(self)
+                                set_panel_text(self)
 
                         # -----------Office_Action_Buttons----------- #
                         if self.in_office:
-                            if self.player.job is None:
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Programmer!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[4]
-                            elif self.player.job.name !="Programmer":
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Programmer!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[4]
-                            else:
-                                self.player.work(self)
-                            set_panel_text(self)    
+                            if self.player.check_lvl(self,load_jobs()[4]):
+
+                                if self.player.job is None:
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Programmer!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[4]
+                                elif self.player.job.name !="Programmer":
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Programmer!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[4]
+                                else:
+                                    self.player.work(self)
+                                set_panel_text(self)
                             # -----------Bank_Action_Buttons----------- #
                         if self.in_bank:
-                            if self.player.job is None:
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as an Accountant!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[3]
-                            elif self.player.job.name !="Accountant":
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as an Accountant!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[3]
-                            else:
-                                self.player.work(self)
-                            set_panel_text(self)
+                            if self.player.check_lvl(self,load_jobs()[3]):
+
+                                if self.player.job is None:
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as an Accountant!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[3]
+                                elif self.player.job.name !="Accountant":
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as an Accountant!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[3]
+                                else:
+                                    self.player.work(self)
+                                set_panel_text(self)
 
 
 
@@ -498,65 +524,71 @@ class Game:
                         # -----------Salesman_Action_Buttons----------- #
 
                         if self.in_drug_store:
-                            if self.player.job is None:
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Salesman!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[1]
-                            elif self.player.job.name !="Salesman":
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Salesman!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[1]
-                            else:
-                                self.player.work(self)
-                            set_panel_text(self)
+                            if self.player.check_lvl(self,load_jobs()[1]):
+
+                                if self.player.job is None:
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Salesman!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[1]
+                                elif self.player.job.name !="Salesman":
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Salesman!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[1]
+                                else:
+                                    self.player.work(self)
+                                set_panel_text(self)
 
                         # -----------Burger_Shop_Action_Buttons----------- #
 
                         if self.in_burgershop:
-                            if self.player.job is None:
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Cashier!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[0]
-                            elif self.player.job.name !="Cashier":
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Cashier!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[0]
-                            else:
-                                self.player.work(self)
-                            set_panel_text(self)
+                            if self.player.check_lvl(self,load_jobs()[0]):
+
+                                if self.player.job is None:
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Cashier!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[0]
+                                elif self.player.job.name !="Cashier":
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Cashier!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[0]
+                                else:
+                                    self.player.work(self)
+                                set_panel_text(self)
 
 
                         # -----------Office_Action_Buttons----------- #
                         if self.in_office:
-                            if self.player.job is None:
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Clerk!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[2]
-                            elif self.player.job.name !="Clerk":
-                                PopupPanel.show_message(
-                                    manager=self.manager,
-                                    text="You now work as a Clerk!",
-                                    screen_size=self.screen.get_size()
-                                )
-                                self.player.job = load_jobs()[2]
-                            else:
-                                self.player.work(self)
-                            set_panel_text(self)
+                            if self.player.check_lvl(self,load_jobs()[2]):
+
+                                if self.player.job is None:
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Clerk!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[2]
+                                elif self.player.job.name !="Clerk":
+                                    PopupPanel.show_message(
+                                        manager=self.manager,
+                                        text="You now work as a Clerk!",
+                                        screen_size=self.screen.get_size()
+                                    )
+                                    self.player.job = load_jobs()[2]
+                                else:
+                                    self.player.work(self)
+                                set_panel_text(self)
 
                         if self.in_bank:
                             self.withdraw_mode = False
@@ -568,9 +600,9 @@ class Game:
                     if event.ui_element == self.primary_action_button:
                         # -----------Medical_Action_Buttons----------- #
                         if self.in_drug_store:
-                            if self.player.money >= 20:
+                            if self.player.money >= (((20 * self.economy.inflation)/10) + 20):
                                 self.player.health += 25
-                                self.player.money -= 20
+                                self.player.money -= (((20 * self.economy.inflation)/10) + 20)
                                 self.player.health = min(self.player.health,100)
                             else:
                                 PopupPanel.show_message(
@@ -581,8 +613,8 @@ class Game:
 
                         # -----------Burger_Shop_Action_Buttons----------- #
                         if self.in_burgershop:
-                            if self.player.money >= 20:
-                                self.player.money -= 20
+                            if self.player.money >= (((20 * self.economy.inflation)/10) + 20):
+                                self.player.money -= (((20 * self.economy.inflation)/10) + 20)
                                 self.player.hunger += 25
                                 self.player.hunger = min(self.player.hunger,100)
                             else:
@@ -603,8 +635,8 @@ class Game:
                     if event.ui_element == self.secondary_action_button:
                         # -----------Burger_Shop_Action_Buttons----------- #
                         if self.in_burgershop:
-                            if self.player.money >= 35:
-                                self.player.money -= 35
+                            if self.player.money >=(((35 * self.economy.inflation)/10) + 35):
+                                self.player.money -= (((35 * self.economy.inflation)/10) + 35)
                                 self.player.hunger += 40
                                 self.player.hunger = min(self.player.hunger,100)
                             else:
@@ -632,6 +664,12 @@ class Game:
                         self.bank_cancel_btn.visible = False
                         self.bank_prompt.visible = False
                         self.bank_continue_btn.visible = False
+
+                    if event.ui_element == self.chart_cancel_btn:
+                        self.is_rate_panel = False
+                        self.chart_cancel_btn.visible = False
+                        self.chart_panel.visible = False
+                        self.chart_image.visible = False
 
                     if event.ui_element == self.change_name_continue_btn:
                         if not self.is_paused:
