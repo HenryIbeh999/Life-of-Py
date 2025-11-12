@@ -2,9 +2,9 @@
   "@small_button": {
     "colours": {
       "normal_border": "#000",
-      "normal_bg": "#95b190cb,#a6e279da,270",
+      "normal_bg": "#6eac4fcb,#98d867d8,270",
       "normal_text": "Black",
-      "hovered_bg": "#95b190cb,#8db866ff,270",
+      "hovered_bg": "#7fd36cd6,#8db866ff,270",
       "hovered_border": "Black",
       "active_bg": "#95b190cb,#9bc07fff,270",
       "hovered_text": "Black",
@@ -240,6 +240,7 @@
   },
   "#menu_panel": {
     "colours": {
+      "dark_bg": "#82b868e1,#98d867d8,270",
       "normal_border": "Black"
     },
     "misc": {
@@ -253,7 +254,7 @@
   },
   "#load_panel": {
     "colours": {
-      "dark_bg": "#95b190cb,#93e98cdc,270"
+      "dark_bg": "#82b868e1,#98d867d8,270"
     }
   },
   "#action_panel": {
@@ -269,7 +270,7 @@
   },
   "#chart_panel": {
     "colours": {
-      "dark_bg": "#95b190cb,#a6e279da,270"
+      "dark_bg": "#9fce9dff,#98d867d8,270"
     },
     "misc": {
       "shape": "rounded_rectangle",

@@ -5,6 +5,7 @@ import pygame_gui
 
 from scripts.tilemap import TileMap
 from subclass.pop_up_panel import PopupPanel
+from scripts.actions import get_salary
 
 
 class PhysicsEntity:
@@ -88,6 +89,7 @@ class Player(PhysicsEntity):
         self.is_dead = False
         self.gender = None
         self.level = 1
+        self.level_progress = 0.0
 
 
     def update(self,tile_map, movement=(0, 0)):
@@ -193,7 +195,9 @@ class Player(PhysicsEntity):
 
 
         else:
-            self.money += self.job.base_salary * game.economy.salary_index
+            self.money += get_salary(game)
+            self.level_progress += 25.0
+            self.level_progress = min(self.level_progress,100)
             self.energy -= self.job.energy_cost
             self.energy = max(self.energy,0)
             self.hunger -= 25
@@ -268,15 +272,6 @@ class Coin(Item):
     def update(self,tile_map, movement=(0, 0)):
         super().update(tile_map,movement=movement)
         self.set_action('coin')
-
-
-class Fireplace(Item):
-    def __init__(self,game,pos,size):
-        super().__init__(game, 'item', pos, size,item_name='fireplace')
-
-    def update(self,tile_map, movement=(0, 0)):
-        super().update(tile_map,movement=movement)
-        self.set_action('fireplace')
 
 
 

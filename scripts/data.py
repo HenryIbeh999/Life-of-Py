@@ -29,6 +29,7 @@ class Player(Base):
     day : Mapped[int]
     gender: Mapped[int] = mapped_column(nullable=True)
     level: Mapped[int]
+    level_progress: Mapped[int]
 
 try:
     Base.metadata.create_all(engine)
@@ -68,7 +69,8 @@ def save_game(player,name,menu):
             deposit=player.deposit,
             day = player.day,
             gender = player.gender,
-            level = player.level
+            level = player.level,
+            level_progress = player.level_progress
         )
         session.add(new_save)
         session.commit()
@@ -88,7 +90,8 @@ def overwrite_save(player,old_name):
         deposit = player.deposit,
         day = player.day,
         gender=player.gender,
-        level=player.level
+        level=player.level,
+        level_progress=player.level_progress
     )
 
     with Session(engine) as session:
@@ -112,6 +115,7 @@ def load_game(player,name):
             player.day = row.day
             player.gender = row.gender
             player.level = row.level
+            player.level_progress = row.level_progress
             return player
         return None
 

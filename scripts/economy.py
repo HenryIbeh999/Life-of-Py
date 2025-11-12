@@ -91,10 +91,13 @@ def update_csv(game):
         else:
             try:
                 df= pd.read_csv(csv_path)
-                if df['Day'].tail(1) == game.player.day:
+                if df['Day'].tail(1).values[0] == game.player.day:
                     return None
+                else:
+                    writer.writerow(row)
+
             except ValueError:
-                writer.writerow(row)
+                pass
 
 
 def load_economy(game):
@@ -130,22 +133,31 @@ def advance_economy(game):
     )
 
     game.economy.salary_index = _random_adjust(
-        game.economy.salary_index, min_value=0.8, max_value=1.5, max_pct_change=0.5
+        game.economy.salary_index, min_value=0.8, max_value=1.6, max_pct_change=0.8
     )
 
     game.economy.tax_rate = _random_adjust(
-        game.economy.tax_rate, min_value=1, max_value=5.0, max_pct_change=0.6
+        game.economy.tax_rate, min_value=1, max_value=5.0, max_pct_change=0.5
     )
 
     game.economy.inflation = round((game.economy.interest_rate + game.economy.salary_index + game.economy.tax_rate) / 3.0, 2)
+
 
 def show_graph(game):
     try:
         csv_path = Path(__file__).resolve().parents[1] / "data" / "save" / f"{game.player.name.split()[0]}_economy.csv"
         csv_path.parent.mkdir(parents=True, exist_ok=True)
         df = pd.read_csv(csv_path.as_posix())
-        numeric_cols = df.select_dtypes(include='number').columns
+        if 'Day' not in df.columns:
+            return None
 
+        # data cleaning
+        df = df.dropna(subset=['Day']).copy()
+        df['Day'] = pd.to_numeric(df['Day'], errors='coerce')
+        df = df.dropna(subset=['Day']).sort_values('Day')
+        df['Day'] = df['Day'].astype(int)
+
+        numeric_cols = df.select_dtypes(include='number').columns.tolist()
         if 'Day' in numeric_cols:
             plot_cols = [c for c in numeric_cols if c != 'Day']
         else:
@@ -155,32 +167,61 @@ def show_graph(game):
                 plot_cols = cols[idx + 1:]
             except ValueError:
                 plot_cols = [c for c in cols if c != 'Day']
+        if not plot_cols:
+            return None
 
-        plot_df = df.dropna(subset=plot_cols, how='all')
-        fig = plt.figure(figsize=(10,9),dpi=100,facecolor="none",edgecolor='#000')
-        fig.suptitle('Economic Indexes',fontsize=30,fontweight='bold')
-        plt.xticks(fontsize=20,rotation=30,fontweight='bold')
-        plt.yticks(fontsize=20,rotation=30,fontweight='bold')
-        plt.ylim(0,10)
-        plt.xlabel("Day", fontsize=25,fontweight='bold')
-        plt.ylabel("Index", fontsize=25,fontweight='bold')
-        sns.set_theme(style='ticks',font='Verdana',font_scale=1)
+        sns.set_style('whitegrid')
+        sns.set_context('talk', rc={
+            'axes.titlesize': 25,
+            'axes.labelsize': 20,
+            'xtick.labelsize': 20,
+            'ytick.labelsize': 20,
+            'legend.fontsize': 20
+        })
 
-        sns.lineplot(data=plot_df, x='Day', y=plot_df['Inflation'], label=plot_df['Inflation'].name,linewidth=6,color='blue')
-        sns.lineplot(data=plot_df, x='Day', y=plot_df['Interest Rate'], label=plot_df['Interest Rate'].name,linewidth=6,color='lime')
-        sns.lineplot(data=plot_df, x='Day', y=plot_df['Salary Index'], label=plot_df['Salary Index'].name,linewidth=6,color='Orange')
-        sns.lineplot(data=plot_df, x='Day', y=plot_df['Tax Rate'], label=plot_df['Tax Rate'].name,linewidth=6,color='Red')
+        palette = sns.color_palette('tab10' if len(plot_cols) <= 10 else 'tab20', n_colors=len(plot_cols))
 
-        plt.legend(fontsize=25)
+        fig, ax = plt.subplots(figsize=(11, 7), dpi=100)
+        for i, col in enumerate(plot_cols):
+            sns.lineplot(data=df, x='Day', y=col, ax=ax, label=col,
+                         linewidth=3, marker='o', markersize=10,
+                         color=palette[i], errorbar=None)
 
+            # annotate last non-null point for that column
+            last_row = df[['Day', col]].dropna().tail(1)
+            if not last_row.empty:
+                x = int(last_row['Day'].iloc[0])
+                y = last_row[col].iloc[0]
+                ax.annotate(f"{y:.2f}", xy=(x, y), xytext=(6, 0),
+                            textcoords='offset points', va='center',
+                            fontsize=18, color=palette[i], fontweight='bold')
 
+        ax.set_title('Economic Indices', fontweight='bold')
+        ax.set_xlabel('Day', fontweight='bold')
+        ax.set_ylabel('Indices', fontweight='bold')
+
+        # dynamic y-limit with sensible lower bound at 0
+        data_max = df[plot_cols].max().max()
+        top = max(5, (data_max * 1.08) if pd.notna(data_max) else 10)
+        ax.set_ylim(0, top)
+
+        # force integer ticks on x axis
+        ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, nbins=10))
+        ax.grid(alpha=0.35)
+        ax.legend(title='', loc='best', frameon=False)
+
+        sns.despine(offset=6, trim=True)
+        plt.tight_layout()
+
+        # render to pygame surface
         buf = io.BytesIO()
-        plt.savefig(buf,format='PNG')
+        plt.savefig(buf, format='PNG', transparent=True)
         plt.close(fig)
         buf.seek(0)
-        plot_image = pygame.image.load(buf,'plot.png')
-
+        plot_image = pygame.image.load(buf, 'plot.png')
         return plot_image
+
     except FileNotFoundError:
         return None
+
 

@@ -70,6 +70,8 @@ class Game:
             'x_button' : load_image('ui/x_button.png'),
             "cursor": load_image("cursor/cursor.png"),
             "ui_character": load_image(f"ui/ui_character.png"),
+            "level": load_image(f"ui/level.png"),
+            "metrics": load_image(f"ui/metrics.png"),
 
         }
 
@@ -88,9 +90,10 @@ class Game:
 
 #******************** UI **********************#
 
-        self.status_panel = UIPanel(relative_rect=pygame.Rect(0,0, 300, 300),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#status_panel"))
+        self.status_panel = UIPanel(relative_rect=pygame.Rect(0,0, 300, 350),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#status_panel"))
         self.name_status_panel = UIPanel(relative_rect=pygame.Rect(0,0, 300, 50),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#player_status_panel"))
         self.player_name_label = UILabel(relative_rect=pygame.Rect(50,10,-1,-1),text=f"{self.player.name}",manager=self.manager,container=self.name_status_panel, object_id=ObjectID(class_id="@text",object_id="#name_text"))
+        self.player_level_label = UILabel(relative_rect=pygame.Rect(200,10,-1,-1),text=f"LVL {self.player.level}",manager=self.manager,container=self.name_status_panel, object_id=ObjectID(class_id="@text",object_id="#lvl_text"))
         self.character_image = UIImage(relative_rect=pygame.Rect(10,5,30,30),image_surface=self.assets['ui_character'],manager=self.manager,container=self.name_status_panel)
         self.job_image = UIImage(relative_rect=pygame.Rect(20,60,24,24),image_surface=self.assets['job'],manager=self.manager,container=self.status_panel)
         self.player_job_label = UILabel(relative_rect=pygame.Rect(48,60,-1,-1),text=f"{self.player.job}",manager=self.manager,container=self.status_panel, object_id=ObjectID(class_id="@text",object_id="#job_text"))
@@ -98,16 +101,25 @@ class Game:
         self.player_money_label = UILabel(relative_rect=pygame.Rect(180,60,-1,-1),text=f"${self.player.money}",manager=self.manager,container=self.status_panel, object_id=ObjectID(class_id="@text",object_id="#money_text"))
         self.money_animator = MoneyAnimator(self.player_money_label)
         self.money_animator.current_value = round((float(self.player.money)),2)
+
         self.energy_image = UIImage(relative_rect=pygame.Rect(20,100,28,28),image_surface=self.assets['energy'],manager=self.manager,container=self.status_panel)
-        self.energy_bar = UIProgressBar(relative_rect=pygame.Rect(48,100,180,27),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#hunger_bar"))
+        self.energy_bar = UIProgressBar(relative_rect=pygame.Rect(0,100,190,35),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#hunger_bar"),anchors={"centerx":"centerx"})
         self.smooth_energy_bar = SmoothProgressBar(self.energy_bar)
+
         self.hunger_image = UIImage(relative_rect=pygame.Rect(20,140,28,28),image_surface=self.assets['hunger'],manager=self.manager,container=self.status_panel)
-        self.hunger_bar = UIProgressBar(relative_rect=pygame.Rect(48,140,180,27),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#hunger_bar"))
+        self.hunger_bar = UIProgressBar(relative_rect=pygame.Rect(0,140,190,35),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#hunger_bar"),anchors={"centerx":"centerx"})
         self.smooth_hunger_bar = SmoothProgressBar(self.hunger_bar)
+
         self.health_image = UIImage(relative_rect=pygame.Rect(20,180,28,28),image_surface=self.assets['health'],manager=self.manager,container=self.status_panel)
-        self.health_bar = UIProgressBar(relative_rect=pygame.Rect(48,180,180,27),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#health_bar"))
+        self.health_bar = UIProgressBar(relative_rect=pygame.Rect(0,180,190,35),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#health_bar"),anchors={"centerx":"centerx"})
         self.smooth_health_bar = SmoothProgressBar(self.health_bar)
-        self.rate_btn = UIButton(relative_rect=pygame.Rect(0,250,62,30),text="",manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@misc_button",object_id="#rate_button"),anchors={"centerx":"centerx"})
+
+        self.lvl_image = UIImage(relative_rect=pygame.Rect(20,220,28,28),image_surface=pygame.image.load('data/images/ui/level.png'),manager=self.manager,container=self.status_panel)
+        self.lvl_bar = UIProgressBar(relative_rect=pygame.Rect(0,220,190,35),manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@high_progress_bar",object_id="#lvl_bar"),anchors={"centerx":"centerx"})
+        self.smooth_lvl_bar = SmoothProgressBar(self.lvl_bar)
+
+
+        self.rate_btn = UIButton(relative_rect=pygame.Rect(0,300,62,30),text="",manager=self.manager,container=self.status_panel,object_id=ObjectID(class_id="@misc_button",object_id="#rate_button"),anchors={"centerx":"centerx"})
 
 
         #******************* MISC ****************************#
@@ -159,6 +171,7 @@ class Game:
 
         self.chart_panel = AnimatedPanel(relative_rect=pygame.Rect(0,0,600,600),manager=self.manager,anchors={'center': 'center'},object_id=ObjectID(class_id="@panel", object_id="#chart_panel"),visible=False)
         self.chart_image = UIImage(relative_rect=pygame.Rect(0,0,550,500),manager=self.manager,image_surface=None,anchors={'center': 'center'},container=self.chart_panel)
+        self.chart_icon = UIImage(relative_rect=pygame.Rect(0,0,50,50),manager=self.manager,image_surface=self.assets['metrics'],anchors={'centerx': 'centerx'},container=self.chart_panel)
         self.chart_cancel_btn = UIButton(relative_rect=pygame.Rect(20,10,30,30),text="",manager=self.manager,container=self.chart_panel,object_id=ObjectID(class_id="@misc_button",object_id="#cancel_button"))
 
 
@@ -174,8 +187,6 @@ class Game:
         for spawner in self.tile_map.extract([('spawners', 0),('spawners', 1)]):
             if spawner['variant'] == 0:
                 self.player.pos = spawner['pos']
-            # if spawner['variant'] == 1:
-            #     self.fireplace = Fireplace(self, pos=spawner['pos'], size=[48, 48])
         self.scroll = [0,0]
 
 
@@ -221,7 +232,7 @@ class Game:
             screen_y = int(player_y * self.screen.get_height() / self.display.get_height())
 
             def interact():
-                if self.is_action_panel is False and self.is_paused is False and not self.pause_panel.visible and not self.player.is_dead and self.is_rate_panel is False:
+                if self.is_action_panel is False and self.is_paused is False and not self.pause_panel.visible and not self.player.is_dead and not self.is_rate_panel:
                     self.clickable = True
                     self.screen.blit(self.assets["x_button"], (screen_x - 20, screen_y - 80))
                 else:
@@ -251,11 +262,14 @@ class Game:
             except AttributeError:
                 self.player_job_label.set_text(f"{self.player.job}")
             self.player_name_label.set_text(f"{self.player.name}")
+            self.player_level_label.set_text(f"LVL {self.player.level}")
             if self.money_animator.current_value != self.player.money:
                 self.assets_sfx['coins'].play(0)
             self.money_animator.set_target(self.player.money)
-            self.smooth_energy_bar.set_value(float(self.player.energy))
+
             self.day_label.set_text(f"Day {self.player.day}")
+
+            self.smooth_energy_bar.set_value(float(self.player.energy))
             if self.player.energy <= 30.0:
                 self.energy_bar.change_object_id("@low_progress_bar")
             else:
@@ -271,6 +285,15 @@ class Game:
                 self.hunger_bar.change_object_id("@low_progress_bar")
             else:
                 self.hunger_bar.change_object_id("@high_progress_bar")
+
+            self.smooth_lvl_bar.set_value(float(self.player.level_progress))
+            if self.player.level_progress >= 100.0:
+                self.player.level_progress = 0.0
+                self.player.level += 1
+                self.player.level = min(self.player.level,15)
+                PopupPanel.show_message(manager=self.manager,
+                                        text=f"You have leveled up to LVL {self.player.level}!!.",
+                                        screen_size=self.screen.get_size(),is_lvl_up=True)
 
 
             if self.deposit_mode:
@@ -451,7 +474,7 @@ class Game:
                                     self.player.job = load_jobs()[5]
                                 else:
                                     self.player.work(self)
-                                set_panel_text(self,load_jobs()[5])
+                                set_panel_text(self)
 
                         # -----------Burger_Shop_Action_Buttons----------- #
                         if self.in_burgershop:
@@ -670,6 +693,7 @@ class Game:
                         self.chart_cancel_btn.visible = False
                         self.chart_panel.visible = False
                         self.chart_image.visible = False
+                        self.chart_icon.visible = False
 
                     if event.ui_element == self.change_name_continue_btn:
                         if not self.is_paused:
@@ -757,9 +781,11 @@ class Game:
             self.money_image.render(self.screen)
 
             self.screen.blit(self.assets['cursor'],mpos)
-            self.manager.update(dt)
-            pygame.display.update()
             self.money_animator.update(dt)
             self.smooth_energy_bar.update(dt)
             self.smooth_hunger_bar.update(dt)
             self.smooth_health_bar.update(dt)
+            self.smooth_lvl_bar.update(dt)
+            self.manager.update(dt)
+            pygame.display.update()
+

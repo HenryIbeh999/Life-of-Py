@@ -56,7 +56,6 @@ class PopupPanel(UIPanel):
             container=self,
             object_id=ObjectID(class_id="@label", object_id="#popup_label")
         )
-        # self.label.set_active_effect(pygame_gui.TEXT_EFFECT_TYPING_APPEAR)
 
         # Kill previous popup if exists
         if PopupPanel.active_popup:
@@ -65,12 +64,17 @@ class PopupPanel(UIPanel):
         PopupPanel.active_popup = self
 
     @staticmethod
-    def show_message(manager, text, screen_size, duration=4000, fade_time=400,positive= True):
+    def show_message(manager, text, screen_size, duration=4000, fade_time=400,positive= True,is_lvl_up=False):
         """Shows or updates the popup with new text."""
         if positive:
-            pygame.mixer.music.load('data/sfx/notice.wav')
-            pygame.mixer.music.set_volume(0.8)
-            pygame.mixer.music.play()
+            if is_lvl_up:
+                pygame.mixer.music.load('data/sfx/level_up.wav')
+                pygame.mixer.music.set_volume(0.8)
+                pygame.mixer.music.play()
+            else:
+                pygame.mixer.music.load('data/sfx/notice.wav')
+                pygame.mixer.music.set_volume(0.8)
+                pygame.mixer.music.play()
         else:
             pygame.mixer.music.load('data/sfx/negative_notice.mp3')
             pygame.mixer.music.set_volume(0.8)
@@ -79,6 +83,7 @@ class PopupPanel(UIPanel):
             popup = PopupPanel.active_popup
             popup.text = text
             popup.label.set_text(text)
+            popup.label.set_active_effect(pygame_gui.TEXT_EFFECT_TYPING_APPEAR)
             popup.elapsed_ms = 0
             popup.alpha = 255
             popup.image.set_alpha(255)

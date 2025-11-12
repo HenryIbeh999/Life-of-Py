@@ -22,3 +22,5 @@ Make a separate screen for the game menu
 #TODO 8
 Make a transition animation
 
+stock image
+level

@@ -146,7 +146,7 @@ def set_panel_text(game):
         game.secondary_action_label.set_text(f"Order a Pizza - ${round((((35 * game.economy.inflation) / 10) + 35),2)}")
 
     if game.in_office:
-        programmer_salary = round(load_jobs()[4].base_salary * game.economy.salary_index,2)
+        programmer_salary = round((load_jobs()[4].base_salary * game.economy.salary_index),2)
         clerk_salary = round(load_jobs()[2].base_salary * game.economy.salary_index,2)
         if game.player.job is None:
             game.primary_job_label.set_text(f"Work in the Tech field - ${programmer_salary}")
@@ -178,6 +178,7 @@ def set_panel_text(game):
 
 def pause(game):
     if game.is_paused is True:
+        game.clickable = False
         game.assets_sfx['ambience'].stop()
         game.assets_sfx['pause'].play(-1)
         game.is_action_panel = False
@@ -212,6 +213,7 @@ def pause(game):
         game.credit_sub_3_label.visible = True
 
     else:
+        game.clickable = True
         game.assets_sfx['pause'].stop()
         game.assets_sfx['ambience'].play(-1)
         game.pause_panel.visible = False
@@ -293,6 +295,7 @@ def circle_transition(game, duration=1000):
     pygame.mixer.music.set_volume(1.0)
     pygame.mixer.music.play()
     while True:
+        game.clickable = False
         now = pygame.time.get_ticks()
         elapsed = now - start_time
         progress = min(1, elapsed / duration)
@@ -328,6 +331,7 @@ def circle_transition(game, duration=1000):
         if progress >= 1:
             game.player.pos[0] = int(game.player.pos[0])
             game.player.pos[1] = int(game.player.pos[1])
+            game.clickable = True
             break
 
 def change_name(game):
@@ -341,7 +345,7 @@ def change_name(game):
         game.primary_action_label.visible = False
         game.change_name_panel.slide_to((0, 50), duration=1.0, easing=pytweening.easeOutBack)
     else:
-        pass
+        game.clickable = True
 
 
 def set_transaction_type(game):
@@ -355,27 +359,33 @@ def set_transaction_type(game):
         game.min_type_label.visible = True
         game.max_type_label.visible = True
 
+def get_salary(game):
+    salary = game.player.job.base_salary * game.economy.salary_index
+    return salary
+
 def gain_interest(game):
     rate = game.economy.interest_rate
     principal = game.player.deposit
-    if game.player.deposit == 0:
-        day= 1
-    else:
-        day = game.player.day
-    interest = round(float((principal * rate * day)/100),2)
+    day= 1
+
+    interest = round(float((principal * rate * day)/20),2)
 
     return interest
 
 def init_chart(game):
     if game.is_rate_panel:
+        game.clickable = False
         game.chart_panel.show()
         game.chart_panel.slide_to((100, 0), duration=1.0, easing=pytweening.easeOutBack)
         game.chart_image.set_image(show_graph(game))
         game.chart_image.show()
+        game.chart_icon.show()
         game.chart_cancel_btn.show()
     else:
+        game.clickable = True
         game.chart_panel.hide()
         game.chart_image.hide()
+        game.chart_icon.hide()
         game.chart_cancel_btn.hide()
 
 
@@ -427,14 +437,14 @@ def tax_player(game):
         if game.player.deposit < 200:
             return
         else:
-            taxable_income = round(((game.player.deposit * game.economy.tax_rate)/30),2)
+            taxable_income = round(((game.player.deposit * game.economy.tax_rate)/5),2)
             game.player.deposit -= taxable_income
             PopupPanel.show_message(manager=game.manager,
                                     text=f"It's tax time, ${taxable_income} has been taken away from you.",
                                     screen_size=game.screen.get_size(),positive=False)
 
     else:
-        taxable_income = round(((game.player.money * game.economy.tax_rate) / 30), 2)
+        taxable_income = round(((game.player.money * game.economy.tax_rate) / 5), 2)
         game.player.money -= taxable_income
         PopupPanel.show_message(manager=game.manager,
                                 text=f"It's tax time, ${taxable_income} has been taken away from you.",
