@@ -27,7 +27,7 @@ class Player(Base):
     job : Mapped[str] = mapped_column(String(50),nullable=True)
     deposit : Mapped[float] = mapped_column(Float)
     day : Mapped[int]
-    gender: Mapped[int] = mapped_column(nullable=True)
+    gender: Mapped[int] = mapped_column(nullable=False)
     level: Mapped[int]
     level_progress: Mapped[int]
 

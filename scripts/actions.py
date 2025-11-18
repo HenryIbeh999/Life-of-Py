@@ -351,7 +351,7 @@ def change_name(game):
 def set_transaction_type(game):
     if game.in_bank:
         game.bank_panel.visible = True
-        game.bank_panel.slide_to((0, 50), duration=1.0, easing=pytweening.easeOutBack)
+        game.bank_panel.slide_to((0, 70), duration=1.0, easing=pytweening.easeOutBack)
         game.bank_type_label.visible = True
         game.bank_prompt.visible = True
         game.bank_cancel_btn.visible = True

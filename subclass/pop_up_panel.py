@@ -56,6 +56,7 @@ class PopupPanel(UIPanel):
             container=self,
             object_id=ObjectID(class_id="@label", object_id="#popup_label")
         )
+        self.label.set_active_effect(pygame_gui.TEXT_EFFECT_TYPING_APPEAR)
 
         # Kill previous popup if exists
         if PopupPanel.active_popup:

@@ -373,7 +373,7 @@
   },
   "#dead_label": {
     "colours": {
-      "normal_text": "#970001"
+      "normal_text": "#C00001"
     },
     "font": {
       "name": "Pixel Square",

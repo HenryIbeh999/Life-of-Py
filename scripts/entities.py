@@ -87,7 +87,7 @@ class Player(PhysicsEntity):
         self.day = 1
         self.last_movement = None
         self.is_dead = False
-        self.gender = None
+        self.gender = int
         self.level = 1
         self.level_progress = 0.0
 
@@ -168,7 +168,7 @@ class Player(PhysicsEntity):
         if self.level < job.lvl_required:
             PopupPanel.show_message(
                 manager=game.manager,
-                text=f"You need to be at LVL {job.lvl_required} to get this job",
+                text=f"You need to be at LVL {job.lvl_required} to get this job.",
                 screen_size=game.screen.get_size(),positive=False
             )
             return False
@@ -196,7 +196,17 @@ class Player(PhysicsEntity):
 
         else:
             self.money += get_salary(game)
-            self.level_progress += 25.0
+            if self.level == 1:
+                self.level_progress += 15.0
+            elif self.level in (2,3):
+                self.level_progress += 10.0
+            elif self.level in (4,5,6):
+                self.level_progress += 5
+            elif self.level in (7,8,9):
+                self.level_progress += 4
+            else:
+                self.level_progress += 3
+
             self.level_progress = min(self.level_progress,100)
             self.energy -= self.job.energy_cost
             self.energy = max(self.energy,0)
@@ -238,6 +248,7 @@ class Player(PhysicsEntity):
             )
 
 
+
 class Item:
     def __init__(self, game, e_type, pos, size,item_name): # Initializes the entity class
         self.game = game
@@ -272,6 +283,16 @@ class Coin(Item):
     def update(self,tile_map, movement=(0, 0)):
         super().update(tile_map,movement=movement)
         self.set_action('coin')
+
+
+class Npc(Item):
+    def __init__(self,game,pos,size,variant):
+        self.variant = variant
+        super().__init__(game, 'npc', pos, size,item_name=f'{self.variant}/idle')
+
+    def update(self,tile_map, movement=(0, 0)):
+        super().update(tile_map,movement=movement)
+        self.set_action(f'{self.variant}/idle')
 
 
 

@@ -1,4 +1,3 @@
-import time
 from scripts.entities import *
 from scripts.utils import Animation, load_images, load_image
 from scripts.tilemap import TileMap
@@ -31,10 +30,8 @@ class Game:
         self.menu = menu
         self.old_name = self.player.name
         self.saved_name = self.player.name
-        self.player.energy = 0
         self.economy = load_economy(self)
-
-
+        self.player.energy = 0
 
 
         #-----------------------------Indicators ----------------------------- #
@@ -60,6 +57,16 @@ class Game:
 
 
         self.assets = {
+            'npc/1/idle': Animation(load_images('entities/npc/npc-1/idle'), img_dur=12),
+            'npc/2/idle': Animation(load_images('entities/npc/npc-2/idle'), img_dur=12),
+            'npc/3/idle': Animation(load_images('entities/npc/npc-3/idle'), img_dur=12),
+            'npc/4/idle': Animation(load_images('entities/npc/npc-4/idle'), img_dur=12),
+            'npc/5/idle': Animation(load_images('entities/npc/npc-5/idle'), img_dur=24),
+            'npc/6/idle': Animation(load_images('entities/npc/npc-6/idle'), img_dur=12),
+            'npc/7/idle': Animation(load_images('entities/npc/npc-7/idle'), img_dur=12),
+            'npc/8/idle': Animation(load_images('entities/npc/npc-8/idle'), img_dur=12),
+            'npc/9/idle': Animation(load_images('entities/npc/npc-9/idle'), img_dur=12),
+            'npc/10/idle': Animation(load_images('entities/npc/npc-10/idle'), img_dur=12),
             'stone': load_images('tiles/stone'),
             'location' : load_image(f'{self.location}.png'),
             'item/coin' : Animation(load_images('coins')),
@@ -184,9 +191,16 @@ class Game:
 
     def load_map(self, map_id):
         self.tile_map.load(f'data/maps/{map_id}.json')
-        for spawner in self.tile_map.extract([('spawners', 0),('spawners', 1)]):
+        self.npcs = []
+        for spawner in self.tile_map.extract([('spawners', 0),('spawners', 1),('spawners', 2),('spawners', 3),('spawners', 4),
+                                              ('spawners', 5),('spawners', 6),('spawners', 7),('spawners', 8),('spawners', 9),
+                                              ('spawners', 10)]):
             if spawner['variant'] == 0:
                 self.player.pos = spawner['pos']
+            else:
+                self.npcs.append(Npc(self, spawner['pos'], (20, 36),variant=spawner['variant']))
+
+
         self.scroll = [0,0]
 
 
@@ -197,7 +211,7 @@ class Game:
         if self.player.day ==1:
             save_economy(self)
             self.economy = load_economy(self)
-            update_csv(self)
+        update_csv(self)
 
         if self.player.gender == 0:
             self.player.set_action('male/front_idle')
@@ -250,12 +264,18 @@ class Game:
 
 
 
+
             if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible and not self.chart_panel.visible:
+                for npc in self.npcs.copy():
+                    npc.update(self.tile_map,(0,0))
+                    npc.render(self.display, offset=render_scroll)
+
                 if not self.player.is_dead:
                     self.player.update(self.tile_map, (self.movement[1] - self.movement[0], self.movement[3]- self.movement[2]))
                 else:
                     self.player.update(self.tile_map,(0,0))
                 self.player.render(self.display, offset=render_scroll)
+
 
             try:
                 self.player_job_label.set_text(f"{self.player.job.name}")
@@ -288,12 +308,14 @@ class Game:
 
             self.smooth_lvl_bar.set_value(float(self.player.level_progress))
             if self.player.level_progress >= 100.0:
-                self.player.level_progress = 0.0
-                self.player.level += 1
-                self.player.level = min(self.player.level,15)
-                PopupPanel.show_message(manager=self.manager,
-                                        text=f"You have leveled up to LVL {self.player.level}!!.",
-                                        screen_size=self.screen.get_size(),is_lvl_up=True)
+                if self.player.level < 15:
+                    self.player.level_progress = 0.0
+                    self.player.level += 1
+                    PopupPanel.show_message(manager=self.manager,
+                                            text=f"You have leveled up to LVL {self.player.level}!!.",
+                                            screen_size=self.screen.get_size(),is_lvl_up=True)
+                else:
+                    self.player.level = min(self.player.level,15)
 
 
             if self.deposit_mode:
@@ -413,8 +435,8 @@ class Game:
                     if event.ui_element == self.pause_btn:
                         if self.player.is_dead:
                             for item in self.menu.save_list:
-                                item.visible = True
-                                self.menu.run()
+                                item.hide()
+                            self.menu.run()
                         else:
                             self.is_paused = not self.is_paused
                             pause(self)
@@ -424,7 +446,7 @@ class Game:
                         self.assets_sfx['ambience'].stop()
                         self.assets_sfx['pause'].stop()
                         for item in self.menu.save_list:
-                            item.visible = False
+                            item.hide()
                         self.menu.run()
                     if event.ui_element == self.pause_load_btn:
                         self.is_paused = False
@@ -731,7 +753,7 @@ class Game:
                         if self.mute:
                             PopupPanel.show_message(
                                 manager=self.manager,
-                                text="SFX State: Muted",
+                                text="SFX State: Muted.",
                                 screen_size=self.screen.get_size(), positive=False
                             )
                             self.assets_sfx['ambience'].set_volume(0.0)
@@ -739,7 +761,7 @@ class Game:
                         else:
                             PopupPanel.show_message(
                                 manager=self.manager,
-                                text="SFX State: Unmuted",
+                                text="SFX State: Unmuted.",
                                 screen_size=self.screen.get_size(),
                             )
                             self.assets_sfx['ambience'].set_volume(0.1)
@@ -781,11 +803,12 @@ class Game:
             self.money_image.render(self.screen)
 
             self.screen.blit(self.assets['cursor'],mpos)
+
+            pygame.display.update()
             self.money_animator.update(dt)
             self.smooth_energy_bar.update(dt)
             self.smooth_hunger_bar.update(dt)
             self.smooth_health_bar.update(dt)
             self.smooth_lvl_bar.update(dt)
             self.manager.update(dt)
-            pygame.display.update()
 

@@ -74,12 +74,10 @@ class Menu:
         }
 
         self.assets_sfx = {
-            'ambience' : pygame.mixer.Sound('data/sfx/ambience.wav'),
             'click' : pygame.mixer.Sound('data/sfx/click.wav'),
             'hard_click' : pygame.mixer.Sound('data/sfx/hard_click.wav'),
         }
 
-        self.assets_sfx['ambience'].set_volume(0.5)
         self.assets_sfx['click'].set_volume(0.8)
         self.assets_sfx['hard_click'].set_volume(0.8)
 
@@ -88,6 +86,8 @@ class Menu:
         self.prompt_query.hide()
         self.prompt_cancel.hide()
         self.prompt_confirm.hide()
+        self.male_check.set_state(False)
+        self.female_check.set_state(False)
         self.male_check.hide()
         self.female_check.hide()
         self.player = load_game(player=self.player, name=self.save_list[save_id].text)
@@ -95,8 +95,11 @@ class Menu:
         Game(player=self.player, menu=self)
 
     def delete_menu_save(self,save_id):
+        try:
+            os.remove(f'data/save/{self.save_list[save_id].text.split()[0]}_economy.csv')
+        except WindowsError:
+            pass
         delete_economy(name=self.save_list[save_id].text)
-        os.remove(f'data/save/{self.save_list[save_id].text.split()[0]}_economy.csv')
         delete_save(name=self.save_list[save_id].text)
 
     def _get_save_index(self, ui_element):
@@ -154,7 +157,7 @@ class Menu:
 
     def run(self):
         pygame.mixer.music.load('data/sfx/menu.mp3')
-        pygame.mixer.music.set_volume(0)
+        pygame.mixer.music.set_volume(0.8)
         pygame.mixer.music.play(-1)
         self.player = Player(self, (431, 205), (20, 36))
         self.reload_save()
@@ -175,6 +178,8 @@ class Menu:
                 self.prompt_query.hide()
                 self.prompt_cancel.hide()
                 self.prompt_confirm.hide()
+                self.male_check.set_state(False)
+                self.female_check.set_state(False)
                 self.male_check.hide()
                 self.female_check.hide()
                 self.load_panel.show()
@@ -212,6 +217,8 @@ class Menu:
                         self.prompt_query.hide()
                         self.prompt_cancel.hide()
                         self.prompt_confirm.hide()
+                        self.male_check.set_state(False)
+                        self.female_check.set_state(False)
                         self.male_check.hide()
                         self.female_check.hide()
                     if event.ui_element == self.load_btn:
@@ -273,6 +280,8 @@ class Menu:
                                     self.prompt_query.hide()
                                     self.prompt_cancel.hide()
                                     self.prompt_confirm.hide()
+                                    self.male_check.set_state(False)
+                                    self.female_check.set_state(False)
                                     self.male_check.hide()
                                     self.female_check.hide()
                                     pygame.mixer.music.stop()
