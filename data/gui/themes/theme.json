@@ -301,7 +301,7 @@
   },
   "#day_text": {
     "colours": {
-      "normal_text": "#313332"
+      "normal_text": "#252325"
     },
     "font": {
       "name": "Kenney R-S",
@@ -340,6 +340,16 @@
   "@menu_text": {
     "colours": {
       "normal_text": "Black"
+    },
+    "font": {
+      "name": "Pixel",
+      "size": "20",
+      "regular_path": "./data/gui/fonts/Kenney Blocks.ttf"
+    }
+  },
+  "#fps_text": {
+    "colours": {
+      "normal_text": "#036300"
     },
     "font": {
       "name": "Pixel",

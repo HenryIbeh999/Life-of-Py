@@ -31,7 +31,8 @@ class Game:
         self.old_name = self.player.name
         self.saved_name = self.player.name
         self.economy = load_economy(self)
-        self.player.energy = 0
+        self.player.level = 15
+        self.player.level_progress = 99
 
 
         #-----------------------------Indicators ----------------------------- #
@@ -79,6 +80,7 @@ class Game:
             "ui_character": load_image(f"ui/ui_character.png"),
             "level": load_image(f"ui/level.png"),
             "metrics": load_image(f"ui/metrics.png"),
+            "star": load_image(f"ui/star.png"),
 
         }
 
@@ -96,14 +98,17 @@ class Game:
 
 
 #******************** UI **********************#
-
+        self.fps_counter = UILabel(relative_rect=pygame.Rect(920,10,-1,-1),text=f"FPS: {self.clock.get_fps()}",manager=self.manager, object_id=ObjectID(class_id="@text",object_id="#fps_text"))
         self.status_panel = UIPanel(relative_rect=pygame.Rect(0,0, 300, 350),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#status_panel"))
         self.name_status_panel = UIPanel(relative_rect=pygame.Rect(0,0, 300, 50),manager=self.manager,object_id=ObjectID(class_id="@panel",object_id="#player_status_panel"))
         self.player_name_label = UILabel(relative_rect=pygame.Rect(50,10,-1,-1),text=f"{self.player.name}",manager=self.manager,container=self.name_status_panel, object_id=ObjectID(class_id="@text",object_id="#name_text"))
-        self.player_level_label = UILabel(relative_rect=pygame.Rect(200,10,-1,-1),text=f"LVL {self.player.level}",manager=self.manager,container=self.name_status_panel, object_id=ObjectID(class_id="@text",object_id="#lvl_text"))
-        self.character_image = UIImage(relative_rect=pygame.Rect(10,5,30,30),image_surface=self.assets['ui_character'],manager=self.manager,container=self.name_status_panel)
-        self.job_image = UIImage(relative_rect=pygame.Rect(20,60,24,24),image_surface=self.assets['job'],manager=self.manager,container=self.status_panel)
-        self.player_job_label = UILabel(relative_rect=pygame.Rect(48,60,-1,-1),text=f"{self.player.job}",manager=self.manager,container=self.status_panel, object_id=ObjectID(class_id="@text",object_id="#job_text"))
+        self.star_image = UIImage(relative_rect=pygame.Rect(200,10,22,22),image_surface=self.assets['star'],manager=self.manager,container=self.name_status_panel)
+        self.player_level_label = UILabel(relative_rect=pygame.Rect(230,10,-1,-1),text=f"LVL {self.player.level}",manager=self.manager,container=self.name_status_panel, object_id=ObjectID(class_id="@text",object_id="#lvl_text"))
+        self.character_image = UIImage(relative_rect=pygame.Rect(15,8,25,25),image_surface=self.assets['ui_character'],manager=self.manager,container=self.name_status_panel)
+        self.job_image = UIImage(relative_rect=pygame.Rect(25,60,24,24),image_surface=self.assets['job'],manager=self.manager,container=self.status_panel)
+        self.player_job_label = UILabel(relative_rect=pygame.Rect(53,60,-1,-1),text=f"{self.player.job}",manager=self.manager,container=self.status_panel, object_id=ObjectID(class_id="@text",object_id="#job_text"))
+
+
         self.money_image = Coin(self,(165,70),(16,16))
         self.player_money_label = UILabel(relative_rect=pygame.Rect(180,60,-1,-1),text=f"${self.player.money}",manager=self.manager,container=self.status_panel, object_id=ObjectID(class_id="@text",object_id="#money_text"))
         self.money_animator = MoneyAnimator(self.player_money_label)
@@ -206,8 +211,8 @@ class Game:
 
 
     def run(self):
-        self.assets_sfx['ambience'].play(-1)
         circle_transition(self)
+        self.assets_sfx['ambience'].play(-1)
         if self.player.day ==1:
             save_economy(self)
             self.economy = load_economy(self)
@@ -217,6 +222,7 @@ class Game:
             self.player.set_action('male/front_idle')
         else:
             self.player.set_action('female/front_idle')
+
         running = True
         while running:
             dt = self.clock.tick(60) / 1000.0
@@ -267,7 +273,7 @@ class Game:
 
             if not self.pause_panel.visible and not self.action_panel.visible and not self.change_name_panel.visible and not self.bank_panel.visible and not self.chart_panel.visible:
                 for npc in self.npcs.copy():
-                    npc.update(self.tile_map,(0,0))
+                    npc.update(self.tile_map, (0, 0))
                     npc.render(self.display, offset=render_scroll)
 
                 if not self.player.is_dead:
@@ -276,7 +282,7 @@ class Game:
                     self.player.update(self.tile_map,(0,0))
                 self.player.render(self.display, offset=render_scroll)
 
-
+            self.fps_counter.set_text(text=f'FPS: {int(self.clock.get_fps())}')
             try:
                 self.player_job_label.set_text(f"{self.player.job.name}")
             except AttributeError:
@@ -308,14 +314,11 @@ class Game:
 
             self.smooth_lvl_bar.set_value(float(self.player.level_progress))
             if self.player.level_progress >= 100.0:
-                if self.player.level < 15:
-                    self.player.level_progress = 0.0
-                    self.player.level += 1
-                    PopupPanel.show_message(manager=self.manager,
-                                            text=f"You have leveled up to LVL {self.player.level}!!.",
-                                            screen_size=self.screen.get_size(),is_lvl_up=True)
-                else:
-                    self.player.level = min(self.player.level,15)
+                self.player.level_progress = 0.0
+                self.player.level += 1
+                PopupPanel.show_message(manager=self.manager,
+                                        text=f"You have leveled up to LVL {self.player.level} !!.",
+                                        screen_size=self.screen.get_size(),is_lvl_up=True)
 
 
             if self.deposit_mode:
@@ -323,7 +326,7 @@ class Game:
                 self.max_type_label.set_text(f"${max(0.0,round(self.player.money,2))}")
             elif self.withdraw_mode:
                 self.bank_type_label.set_text("Withdraw")
-                self.max_type_label.set_text(f"${max(0.0,self.player.deposit)}")
+                self.max_type_label.set_text(f"${max(0.0,round(self.player.deposit,2))}")
 
 
             for event in pygame.event.get():
@@ -452,7 +455,7 @@ class Game:
                         self.is_paused = False
                         pause(self)
                         self.player= load_game(player=self.player,name=self.saved_name)
-                        self.player.name = self.player.name[0]
+                        self.player.name = self.player.name
                         PopupPanel.show_message(
                             manager=self.manager,
                             text="Current session loaded.",
@@ -803,12 +806,12 @@ class Game:
             self.money_image.render(self.screen)
 
             self.screen.blit(self.assets['cursor'],mpos)
-
-            pygame.display.update()
             self.money_animator.update(dt)
             self.smooth_energy_bar.update(dt)
             self.smooth_hunger_bar.update(dt)
             self.smooth_health_bar.update(dt)
             self.smooth_lvl_bar.update(dt)
             self.manager.update(dt)
+            pygame.display.update()
+
 

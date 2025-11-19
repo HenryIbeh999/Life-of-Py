@@ -149,7 +149,7 @@ def show_graph(game):
     try:
         csv_path = Path(__file__).resolve().parents[1] / "data" / "save" / f"{game.player.name.split()[0]}_economy.csv"
         csv_path.parent.mkdir(parents=True, exist_ok=True)
-        df = pd.read_csv(csv_path.as_posix()).rolling(window=2).mean()
+        df = pd.read_csv(csv_path.as_posix())
         if 'Day' not in df.columns:
             return None
 
@@ -204,12 +204,12 @@ def show_graph(game):
 
         # dynamic y-limit with sensible lower bound at 0
         data_max = df[plot_cols].max().max()
-        top = max(3, (data_max * 1.08) if pd.notna(data_max) else 10)
+        top = max(2, (data_max * 1.08) if pd.notna(data_max) else 10)
         ax.set_ylim(0, top)
 
-        # force integer ticks on x axis
+        # force integer ticks on x-axis
         ax.xaxis.set_major_locator(plt.MaxNLocator(integer=True, nbins=10))
-        ax.grid(alpha=0.35)
+        ax.grid(alpha=0.85)
         ax.legend(title='', loc='best', frameon=False)
 
         sns.despine(offset=6, trim=True)

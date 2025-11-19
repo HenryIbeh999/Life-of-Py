@@ -12,17 +12,17 @@ from scripts.jobs import load_jobs
 
 def show_action(game, primary_action_type, secondary_action_type):
     if game.is_action_panel is True:
-        game.action_panel.visible = True
+        game.action_panel.show()
         game.action_panel.slide_to((0, 0), duration=1.0, easing=pytweening.easeOutBack)
-        game.ui_action_image.visible = True
-        game.small_action_panel.visible = True
+        game.ui_action_image.show()
+        game.small_action_panel.show()
         game.small_action_panel.slide_to((0, -167), duration=1.0, easing=pytweening.easeOutBack)
-        game.primary_job_button.visible = True
-        game.primary_job_label.visible = True
-        game.secondary_job_button.visible = True
-        game.secondary_job_label.visible = True
-        game.primary_action_button.visible = True
-        game.primary_action_label.visible = True
+        game.primary_job_button.show()
+        game.primary_job_label.show()
+        game.secondary_job_button.show()
+        game.secondary_job_label.show()
+        game.primary_action_button.show()
+        game.primary_action_label.show()
         game.rate_btn.disable()
 
 
@@ -36,6 +36,8 @@ def show_action(game, primary_action_type, secondary_action_type):
                 ObjectID(class_id="@ui_button", object_id=f"#action_doctor_button"))
             game.secondary_job_button.change_object_id(
                 ObjectID(class_id="@ui_button", object_id=f"#job_salesman_button"))
+            game.secondary_action_button.hide()
+            game.secondary_action_label.hide()
             game.in_drug_store = True
             game.in_burgershop = False
             game.in_office = False
@@ -53,8 +55,8 @@ def show_action(game, primary_action_type, secondary_action_type):
                 ObjectID(class_id="@ui_button", object_id="#job_cashier_button"))
             game.secondary_action_button.change_object_id(
                 ObjectID(class_id="@ui_button", object_id="#action_pizza_button"))
-            game.secondary_action_button.visible = True
-            game.secondary_action_label.visible = True
+            game.secondary_action_button.show()
+            game.secondary_action_label.show()
             game.in_drug_store = False
             game.in_burgershop = True
             game.in_office = False
@@ -69,8 +71,8 @@ def show_action(game, primary_action_type, secondary_action_type):
                 ObjectID(class_id="@ui_button", object_id="#action_change_name_button"))
             game.secondary_job_button.change_object_id(
                 ObjectID(class_id="@ui_button", object_id="#job_clerk_button"))
-            game.secondary_action_button.visible = False
-            game.secondary_action_label.visible = False
+            game.secondary_action_button.hide()
+            game.secondary_action_label.hide()
             game.in_drug_store = False
             game.in_burgershop = False
             game.in_office = True
@@ -86,25 +88,25 @@ def show_action(game, primary_action_type, secondary_action_type):
             game.primary_action_button.change_object_id(
                 ObjectID(class_id="@ui_button", object_id="#action_withdraw_button"))
 
-            game.secondary_action_button.visible = False
-            game.secondary_action_label.visible = False
+            game.secondary_action_button.hide()
+            game.secondary_action_label.hide()
             game.in_drug_store = False
             game.in_burgershop = False
             game.in_office = False
             game.in_bank = True
             set_panel_text(game)
     else:
-        game.action_panel.visible = False
-        game.small_action_panel.visible = False
-        game.ui_action_image.visible = False
-        game.primary_job_button.visible = False
-        game.primary_job_label.visible = False
-        game.secondary_job_button.visible = False
-        game.secondary_job_label.visible = False
-        game.primary_action_button.visible = False
-        game.primary_action_label.visible = False
-        game.secondary_action_button.visible = False
-        game.secondary_action_label.visible = False
+        game.action_panel.hide()
+        game.small_action_panel.hide()
+        game.ui_action_image.hide()
+        game.primary_job_button.hide()
+        game.primary_job_label.hide()
+        game.secondary_job_button.hide()
+        game.secondary_job_label.hide()
+        game.primary_action_button.hide()
+        game.primary_action_label.hide()
+        game.secondary_action_button.hide()
+        game.secondary_action_label.hide()
         game.rate_btn.enable()
 
 
@@ -182,86 +184,49 @@ def pause(game):
         game.assets_sfx['ambience'].stop()
         game.assets_sfx['pause'].play(-1)
         game.is_action_panel = False
-        game.action_panel.visible = False
-        game.small_action_panel.visible = False
-        game.ui_action_image.visible = False
-        game.primary_job_button.visible = False
-        game.primary_job_label.visible = False
-        game.secondary_job_button.visible = False
-        game.secondary_job_label.visible = False
-        game.primary_action_button.visible = False
-        game.primary_action_label.visible = False
-        game.secondary_action_button.visible = False
-        game.secondary_action_label.visible = False
-        game.change_name_panel.visible = False
-        game.change_name_prompt.visible = False
-        game.change_name_cancel_btn.visible = False
+        game.action_panel.hide()
+        game.small_action_panel.hide()
+        game.ui_action_image.hide()
+        game.primary_job_button.hide()
+        game.primary_job_label.hide()
+        game.secondary_job_button.hide()
+        game.secondary_job_label.hide()
+        game.primary_action_button.hide()
+        game.primary_action_label.hide()
+        game.secondary_action_button.hide()
+        game.secondary_action_label.hide()
+        game.change_name_panel.hide()
+        game.change_name_prompt.hide()
+        game.change_name_cancel_btn.hide()
         game.is_rate_panel = False
-        game.chart_panel.visible = False
-        game.chart_image.visible = False
-        game.chart_cancel_btn.visible = False
+        game.chart_panel.hide()
+        game.chart_image.hide()
+        game.chart_cancel_btn.hide()
         game.rate_btn.disable()
 
 
-        game.pause_panel.visible = True
+        game.pause_panel.show()
         game.pause_panel.slide_to((0, 0), duration=1.0, easing=pytweening.easeOutBack)
-        game.pause_load_btn.visible = True
-        game.pause_menu_btn.visible = True
-        game.credit_head_label.visible = True
-        game.credit_sub_1_label.visible = True
-        game.credit_sub_2_label.visible = True
-        game.credit_sub_3_label.visible = True
+        game.pause_load_btn.show()
+        game.pause_menu_btn.show()
+        game.credit_head_label.show()
+        game.credit_sub_1_label.show()
+        game.credit_sub_2_label.show()
+        game.credit_sub_3_label.show()
 
     else:
         game.clickable = True
         game.assets_sfx['pause'].stop()
         game.assets_sfx['ambience'].play(-1)
-        game.pause_panel.visible = False
-        game.pause_load_btn.visible = False
-        game.pause_menu_btn.visible = False
-        game.credit_head_label.visible = False
-        game.credit_sub_1_label.visible = False
-        game.credit_sub_2_label.visible = False
-        game.credit_sub_3_label.visible = False
+        game.pause_panel.hide()
+        game.pause_load_btn.hide()
+        game.pause_menu_btn.hide()
+        game.credit_head_label.hide()
+        game.credit_sub_1_label.hide()
+        game.credit_sub_2_label.hide()
+        game.credit_sub_3_label.hide()
         game.rate_btn.enable()
 
-
-
-def exit_house(game):
-    game.is_home = False
-    game.location = "suburb"
-    if game.player.energy <= 30:
-        game.assets['location'] = load_image(f'night_{game.location}.jpg')
-    else:
-        game.assets['location'] = load_image(f'{game.location}.png')
-
-
-    game.load_map(game.location)
-
-    circle_transition(game)
-
-
-def exit_suburb(game):
-    game.location = "town"
-    if game.player.energy <= 30:
-        game.assets['location'] = load_image(f'night_{game.location}.jpg')
-    else:
-        game.assets['location'] = load_image(f'{game.location}.png')
-
-    game.load_map(game.location)
-
-    circle_transition(game)
-
-def exit_town(game):
-    game.location = "suburb"
-    if game.player.energy <= 30:
-        game.assets['location'] = load_image(f'night_{game.location}.jpg')
-    else:
-        game.assets['location'] = load_image(f'{game.location}.png')
-
-    game.load_map(game.location)
-
-    circle_transition(game)
 
 def change_location(game,location):
     game.location = location
@@ -337,12 +302,12 @@ def circle_transition(game, duration=1000):
 def change_name(game):
     game.is_change_name_panel = True
     if game.is_change_name_panel and game.in_office:
-        game.change_name_panel.visible = True
-        game.change_name_cancel_btn.visible = True
-        game.change_name_prompt.visible = True
-        game.change_name_continue_btn.visible = True
-        game.primary_action_button.visible = False
-        game.primary_action_label.visible = False
+        game.change_name_panel.show()
+        game.change_name_cancel_btn.show()
+        game.change_name_prompt.show()
+        game.change_name_continue_btn.show()
+        game.primary_action_button.hide()
+        game.primary_action_label.hide()
         game.change_name_panel.slide_to((0, 50), duration=1.0, easing=pytweening.easeOutBack)
     else:
         game.clickable = True
@@ -350,14 +315,14 @@ def change_name(game):
 
 def set_transaction_type(game):
     if game.in_bank:
-        game.bank_panel.visible = True
+        game.bank_panel.show()
         game.bank_panel.slide_to((0, 70), duration=1.0, easing=pytweening.easeOutBack)
-        game.bank_type_label.visible = True
-        game.bank_prompt.visible = True
-        game.bank_cancel_btn.visible = True
-        game.bank_continue_btn.visible = True
-        game.min_type_label.visible = True
-        game.max_type_label.visible = True
+        game.bank_type_label.show()
+        game.bank_prompt.show()
+        game.bank_cancel_btn.show()
+        game.bank_continue_btn.show()
+        game.min_type_label.show()
+        game.max_type_label.show()
 
 def get_salary(game):
     salary = game.player.job.base_salary * game.economy.salary_index
@@ -390,7 +355,7 @@ def init_chart(game):
 
 
 def advance_day(game):
-    # game.player.energy = 100.0
+    game.player.energy = 100.0
     game.player.day += 1
     game.is_rate_panel = False
     game.chart_panel.hide()
@@ -424,8 +389,8 @@ def end_life(game):
                              text="YOU ARE DEAD!!!",manager=game.manager,object_id=ObjectID("@label","#dead_label"),visible=False)
         small_dead_label = UILabel(relative_rect=(0,330,-1,-1), anchors={"center":"center"},
                              text="Try to be happy next time :)",manager=game.manager,object_id=ObjectID("@label","#small_dead_label"),visible=False)
-        dead_label.visible = True
-        small_dead_label.visible = True
+        dead_label.show()
+        small_dead_label.show()
         game.player.is_dead = True
         game.player.die()
 

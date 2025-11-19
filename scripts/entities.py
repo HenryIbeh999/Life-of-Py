@@ -205,7 +205,7 @@ class Player(PhysicsEntity):
             elif self.level in (7,8,9):
                 self.level_progress += 4
             else:
-                self.level_progress += 3
+                self.level_progress += 2.5
 
             self.level_progress = min(self.level_progress,100)
             self.energy -= self.job.energy_cost
