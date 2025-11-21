@@ -5,7 +5,7 @@ import json
 NEIGHBOR_OFFSET = [(-1, 0), (-1, -1), (0, -1), (1, -1), (1, 0), (0, 0), (-1, 1), (0, 1), (1, 1)]
 
 # Define tile types that interact with physics
-PHYSICS_TILES = {"large_decor", "stone", "building", "wall", "structure"}
+PHYSICS_TILES = {"stone"}
 
 
 class TileMap:

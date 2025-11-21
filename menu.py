@@ -11,18 +11,19 @@ from scripts.utils import Animation, load_images, load_image
 from scripts.economy import delete_economy
 from game import Game
 from subclass.pop_up_panel import PopupPanel
+from scripts.path_utils import get_resource_path, get_save_path
 import os
-
 
 class Menu:
     def __init__(self):
         pygame.init()
         pygame.display.set_caption('Life of Py')
+        pygame_icon = pygame.image.load('life_of_py.png')
+        pygame.display.set_icon(pygame_icon)
         self.window_surface = pygame.display.set_mode((1024, 768))
-
         self.background = pygame.Surface((1024, 768),pygame.SRCALPHA)
         self.clock = pygame.time.Clock()
-        self.manager = pygame_gui.UIManager((1024, 768), theme_path="data/gui/themes/theme.json")
+        self.manager = pygame_gui.UIManager((1024, 768), theme_path=get_resource_path("data/gui/themes/theme.json"))
         self.game = Game
         self.is_save_panel = False
         self.load_mode = False
@@ -96,8 +97,9 @@ class Menu:
 
     def delete_menu_save(self,save_id):
         try:
-            os.remove(f'data/save/{self.save_list[save_id].text.split()[0]}_economy.csv')
-        except WindowsError:
+            csv_path = os.path.join(get_save_path(), f"{self.save_list[save_id].text.split()[0]}_economy.csv")
+            os.remove(csv_path)
+        except (WindowsError, FileNotFoundError):
             pass
         delete_economy(name=self.save_list[save_id].text)
         delete_save(name=self.save_list[save_id].text)

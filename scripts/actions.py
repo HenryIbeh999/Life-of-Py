@@ -10,6 +10,7 @@ from subclass.pop_up_panel import PopupPanel
 from scripts.economy import *
 from scripts.jobs import load_jobs
 
+"""There wasn't really an appropriate place to put these functions, so here they are."""
 def show_action(game, primary_action_type, secondary_action_type):
     if game.is_action_panel is True:
         game.action_panel.show()

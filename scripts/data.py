@@ -7,9 +7,9 @@ from sqlalchemy.orm import *
 from subclass.pop_up_panel import PopupPanel
 from pathlib import Path
 from sqlalchemy import create_engine
+from scripts.path_utils import get_resource_path, get_save_path
 
-db_path = Path(__file__).resolve().parents[1] / "data" / "save" / "save.db"
-db_path.parent.mkdir(parents=True, exist_ok=True)
+db_path = Path(get_save_path("save.db"))
 
 engine = create_engine(f"sqlite+pysqlite:///{db_path.as_posix()}", future=True)
 
@@ -78,7 +78,7 @@ def save_game(player,name,menu):
 
 
 
-
+# This is specifically for in-game save overwriting
 def overwrite_save(player,old_name):
     new_save = Player(
         name = player.name,
@@ -124,7 +124,7 @@ def delete_save(name):
         session.execute(delete(Player).where(Player.name==name))
         session.commit()
 
-
+# I did this to display the save objects in the load menu
 def query_save(menu):
     try:
         with Session(engine) as session:

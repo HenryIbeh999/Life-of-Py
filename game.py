@@ -14,26 +14,26 @@ from subclass.pop_up_panel import PopupPanel
 from subclass.ui_label import MoneyAnimator
 from subclass.ui_progress_bar import SmoothProgressBar
 from scripts.economy import *
+from scripts.path_utils import get_resource_path
 
 class Game:
     def __init__(self,menu,player):
         pygame.init()
         # Screen setup
         pygame.display.set_caption("Life of Py")
+        pygame_icon = pygame.image.load('life_of_py.png')
+        pygame.display.set_icon(pygame_icon)
         self.screen = pygame.display.set_mode((1024, 768))
         self.display = pygame.Surface((512, 384), pygame.SRCALPHA)  # Internal display for scaling
         self.display_2 = pygame.Surface((512, 384)).convert()  # Secondary display
         self.clock = pygame.time.Clock()
         self.movement = [False,False,False,False] #Movement flags for left , right, top, bottom
-        self.manager = pygame_gui.UIManager((1024, 768), theme_path="data/gui/themes/theme.json")
+        self.manager = pygame_gui.UIManager((1024, 768), theme_path=get_resource_path("data/gui/themes/theme.json"))
         self.player = player
         self.menu = menu
         self.old_name = self.player.name
         self.saved_name = self.player.name
         self.economy = load_economy(self)
-        self.player.level = 15
-        self.player.level_progress = 99
-
 
         #-----------------------------Indicators ----------------------------- #
         self.location = ""
@@ -225,7 +225,7 @@ class Game:
 
         running = True
         while running:
-            dt = self.clock.tick(60) / 1000.0
+            dt = self.clock.tick(120) / 1000.0
             check_time(self)
             self.display.fill((0, 0, 0, 0))
             if self.is_night:
@@ -356,6 +356,7 @@ class Game:
                         if event.key == pygame.K_ESCAPE:
                             self.is_paused = not self.is_paused
                             pause(self)
+                        
 
                     if event.key == pygame.K_x:
                         if self.clickable:
@@ -774,9 +775,9 @@ class Game:
 
             self.display_2.blit(self.display,(0,0))
 
-
-            # Draw
+            # Blit display_2 to screen (scaled 2x)
             self.screen.blit(pygame.transform.scale(self.display_2, self.screen.get_size()), (0, 0))
+            
             self.manager.draw_ui(self.screen)
 
             if self.location == "home":

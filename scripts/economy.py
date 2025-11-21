@@ -9,9 +9,9 @@ import csv
 import io
 import seaborn as sns
 import random
+from scripts.path_utils import get_resource_path, get_save_path
 
-db_path = Path(__file__).resolve().parents[1] / "data" / "save" / "economy.db"
-db_path.parent.mkdir(parents=True, exist_ok=True)
+db_path = Path(get_save_path("economy.db"))
 
 engine = create_engine(f"sqlite+pysqlite:///{db_path.as_posix()}", future=True)
 
@@ -69,8 +69,7 @@ def save_economy(game):
         session.commit()
 
 def update_csv(game):
-    csv_path = Path(__file__).resolve().parents[1] / "data" / "save" / f"{game.player.name.split()[0]}_economy.csv"
-    csv_path.parent.mkdir(parents=True, exist_ok=True)
+    csv_path = Path(get_save_path(f"{game.player.name.split()[0]}_economy.csv"))
 
     header = ['Day','Inflation','Interest Rate','Salary Index','Tax Rate']
     row = [
@@ -146,9 +145,9 @@ def advance_economy(game):
 
 
 def show_graph(game):
+    """Kinda self expalanatory function to show economic graph using matplotlib and seaborn"""
     try:
-        csv_path = Path(__file__).resolve().parents[1] / "data" / "save" / f"{game.player.name.split()[0]}_economy.csv"
-        csv_path.parent.mkdir(parents=True, exist_ok=True)
+        csv_path = Path(get_save_path(f"{game.player.name.split()[0]}_economy.csv"))
         df = pd.read_csv(csv_path.as_posix())
         if 'Day' not in df.columns:
             return None
