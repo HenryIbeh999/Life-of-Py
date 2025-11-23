@@ -141,7 +141,7 @@ def advance_economy(game):
         game.economy.tax_rate, min_value=1, max_value=5.0, max_pct_change=0.5
     )
 
-    game.economy.inflation = round((game.economy.interest_rate + game.economy.salary_index + game.economy.tax_rate) / 3.0, 2)
+    game.economy.inflation = round((game.economy.interest_rate + game.economy.salary_index + game.economy.tax_rate) / 2.0, 2)
 
 
 def show_graph(game):

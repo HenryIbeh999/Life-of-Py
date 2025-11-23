@@ -10,6 +10,7 @@ scripts/splitter.py
 #Database files
 data/save/save.db
 data/save/economy.db
+data/save/achievements.db
 
 #CSV file
 *.csv

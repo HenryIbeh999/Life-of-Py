@@ -9,6 +9,7 @@ from scripts.entities import Player
 from scripts.data import save_game,load_game,delete_save, query_save
 from scripts.utils import Animation, load_images, load_image
 from scripts.economy import delete_economy
+from scripts.achievements import delete_achievement
 from game import Game
 from subclass.pop_up_panel import PopupPanel
 from scripts.path_utils import get_resource_path, get_save_path
@@ -102,6 +103,7 @@ class Menu:
         except (WindowsError, FileNotFoundError):
             pass
         delete_economy(name=self.save_list[save_id].text)
+        delete_achievement(name=self.save_list[save_id].text)
         delete_save(name=self.save_list[save_id].text)
 
     def _get_save_index(self, ui_element):

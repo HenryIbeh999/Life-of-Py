@@ -196,6 +196,7 @@ class Player(PhysicsEntity):
 
         else:
             self.money += get_salary(game)
+            game.achievement.money_made += get_salary(game)
             if self.level == 1:
                 self.level_progress += 15.0
             elif self.level in (2,3):

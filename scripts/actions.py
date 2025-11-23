@@ -9,6 +9,7 @@ import pygame
 from subclass.pop_up_panel import PopupPanel
 from scripts.economy import *
 from scripts.jobs import load_jobs
+from subclass.ui_panel import AnimatedPanel
 
 """There wasn't really an appropriate place to put these functions, so here they are."""
 def show_action(game, primary_action_type, secondary_action_type):
@@ -240,7 +241,7 @@ def change_location(game,location):
 
 
 def check_time(game):
-    if game.player.energy <= 30:
+    if game.player.energy <= 40:
         game.is_night = True
         if game.is_night:
             if game.location == 'home':
@@ -371,6 +372,7 @@ def advance_day(game):
         if game.player.deposit > 0:
             interest = gain_interest(game)
             game.player.deposit += interest
+            game.achievement.money_made += interest
             PopupPanel.show_message(manager=game.manager,text=f"You have gained a ${interest} interest on your deposit",screen_size=game.screen.get_size())
     return
 
@@ -384,14 +386,69 @@ def end_life(game):
         )
         return False
 
-    elif game.player.health == 0:
+    elif game.player.health == 0.0 or game.player.hunger == 0.0:
+        dead_panel = AnimatedPanel(relative_rect=pygame.Rect(0,0,400,500),manager=game.manager,anchors={'center': 'center'},object_id=ObjectID(class_id="@panel", object_id="#death_panel"))
+        small_dead_panel =AnimatedPanel(relative_rect=pygame.Rect(0,0,300,300),manager=game.manager,container=dead_panel,anchors={'center': 'center'},object_id=ObjectID(class_id="@panel", object_id="#death_panel"))
+        dead_panel.slide_to((300, 0), duration=1.0, easing=pytweening.easeOutBack)
 
-        dead_label = UILabel(relative_rect=(0,250,-1,-1), anchors={"center":"center"},
-                             text="YOU ARE DEAD!!!",manager=game.manager,object_id=ObjectID("@label","#dead_label"),visible=False)
-        small_dead_label = UILabel(relative_rect=(0,330,-1,-1), anchors={"center":"center"},
-                             text="Try to be happy next time :)",manager=game.manager,object_id=ObjectID("@label","#small_dead_label"),visible=False)
-        dead_label.show()
-        small_dead_label.show()
+        UILabel(relative_rect=(0,20,-1,-1), anchors={"centerx":"centerx"},container=dead_panel,text="YOU ARE DEAD",manager=game.manager,object_id=ObjectID("@label","#dead_label"))
+        if game.player.health == 0:
+            UILabel(relative_rect=(0,60,-1,-1), anchors={"centerx":"centerx"},container=dead_panel,
+                                 text="Health is Wealth",manager=game.manager,object_id=ObjectID("@label","#small_dead_label"))
+        elif game.player.hunger == 0:
+            UILabel(relative_rect=(0, 60, -1, -1), anchors={"centerx": "centerx"},
+                                       container=dead_panel,
+                                       text="Due to starvation", manager=game.manager,
+                                       object_id=ObjectID("@label", "#small_dead_label"))
+
+        UILabel(relative_rect=(-73,20,-1,-1),container=small_dead_panel,anchors={"centerx":"centerx"},
+                             text=f"Days lived: ",manager=game.manager,object_id=ObjectID("@label","#achievement_label"))
+        UILabel(relative_rect=(0,20,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"{game.achievement.days_lived}",manager=game.manager,object_id=ObjectID("@label","#achievement_value"))
+
+
+
+        UILabel(relative_rect=(-43,60,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"Total Money made: ",manager=game.manager,object_id=ObjectID("@label","#achievement_label"))
+        UILabel(relative_rect=(90,60,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"${round(game.achievement.money_made,2)}",manager=game.manager,object_id=ObjectID("@label","#achievement_value"))
+
+
+
+        UILabel(relative_rect=(-40,100,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"Total Money spent: ",manager=game.manager,object_id=ObjectID("@label","#achievement_label"))
+        UILabel(relative_rect=(90,100,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"${round(game.achievement.money_spent,2)}",manager=game.manager,object_id=ObjectID("@label","#achievement_value"))
+
+
+
+        UILabel(relative_rect=(-50,140,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"Total Taxes paid: ",manager=game.manager,object_id=ObjectID("@label","#achievement_label"))
+        UILabel(relative_rect=(70,140,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"${round(game.achievement.taxes_paid,2)}",manager=game.manager,object_id=ObjectID("@label","#achievement_value"))
+
+
+
+        UILabel(relative_rect=(-40,180,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"Total Jobs worked: ",manager=game.manager,object_id=ObjectID("@label","#achievement_label"))
+        UILabel(relative_rect=(70,180,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"{game.achievement.jobs_had}",manager=game.manager,object_id=ObjectID("@label","#achievement_value"))
+
+
+
+        UILabel(relative_rect=(-30,220,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"Max Level obtained: ",manager=game.manager,object_id=ObjectID("@label","#achievement_label"))
+        UILabel(relative_rect=(100,220,-1,-1), anchors={"centerx":"centerx"},container=small_dead_panel,
+                             text=f"LVL {game.achievement.level}",manager=game.manager,object_id=ObjectID("@label","#achievement_value"))
+
+
+
+        UILabel(relative_rect=(0, 430, -1, -1), anchors={"centerx": "centerx"}, container=dead_panel,
+                                   text="-TESTIMONIAL-", manager=game.manager,
+                                   object_id=ObjectID("@label", "#testimonial_label"))
+
+
+
         game.player.is_dead = True
         game.player.die()
 
@@ -405,6 +462,8 @@ def tax_player(game):
         else:
             taxable_income = round(((game.player.deposit * game.economy.tax_rate)/5),2)
             game.player.deposit -= taxable_income
+            game.achievement.money_spent += taxable_income
+            game.achievement.taxes_paid += taxable_income
             PopupPanel.show_message(manager=game.manager,
                                     text=f"It's tax time, ${taxable_income} has been taken away from you.",
                                     screen_size=game.screen.get_size(),positive=False)
@@ -412,6 +471,8 @@ def tax_player(game):
     else:
         taxable_income = round(((game.player.money * game.economy.tax_rate) / 5), 2)
         game.player.money -= taxable_income
+        game.achievement.money_spent += taxable_income
+        game.achievement.taxes_paid += taxable_income
         PopupPanel.show_message(manager=game.manager,
                                 text=f"It's tax time, ${taxable_income} has been taken away from you.",
                                 screen_size=game.screen.get_size(),positive=False)

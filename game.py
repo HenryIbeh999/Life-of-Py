@@ -3,10 +3,11 @@ from scripts.utils import Animation, load_images, load_image
 from scripts.tilemap import TileMap
 import pygame
 import sys
+import os
 import pygame_gui
 from pygame_gui.elements import *
 from pygame_gui.core import ObjectID
-from scripts.data import save_game, load_game, query_save, overwrite_save
+from scripts.data import save_game, load_game, query_save, overwrite_save, delete_save
 from scripts.jobs import load_jobs
 from scripts.actions import *
 from subclass.ui_panel import AnimatedPanel
@@ -14,6 +15,7 @@ from subclass.pop_up_panel import PopupPanel
 from subclass.ui_label import MoneyAnimator
 from subclass.ui_progress_bar import SmoothProgressBar
 from scripts.economy import *
+from scripts.achievements import *
 from scripts.path_utils import get_resource_path
 
 class Game:
@@ -34,6 +36,7 @@ class Game:
         self.old_name = self.player.name
         self.saved_name = self.player.name
         self.economy = load_economy(self)
+        self.achievement = load_achievement(self)
 
         #-----------------------------Indicators ----------------------------- #
         self.location = ""
@@ -215,7 +218,10 @@ class Game:
         self.assets_sfx['ambience'].play(-1)
         if self.player.day ==1:
             save_economy(self)
+            save_achievement(self)
             self.economy = load_economy(self)
+            self.achievement = load_achievement(self)
+
         update_csv(self)
 
         if self.player.gender == 0:
@@ -317,7 +323,7 @@ class Game:
                 self.player.level_progress = 0.0
                 self.player.level += 1
                 PopupPanel.show_message(manager=self.manager,
-                                        text=f"You have leveled up to LVL {self.player.level} !!.",
+                                        text=f"You have leveled up to LVL {self.player.level} !",
                                         screen_size=self.screen.get_size(),is_lvl_up=True)
 
 
@@ -433,11 +439,18 @@ class Game:
                         self.assets_sfx['walk'].stop()
 
 
-
                 if event.type == pygame_gui.UI_BUTTON_PRESSED:
                     self.assets_sfx['click'].play()
                     if event.ui_element == self.pause_btn:
                         if self.player.is_dead:
+                            try:
+                                csv_path = os.path.join(get_save_path(),f"{self.player.name.split()[0]}_economy.csv")
+                                os.remove(csv_path)
+                            except (WindowsError, FileNotFoundError):
+                                pass
+                            delete_economy(name=self.player.name)
+                            delete_achievement(name=self.player.name)
+                            delete_save(name=self.player.name)
                             for item in self.menu.save_list:
                                 item.hide()
                             self.menu.run()
@@ -467,6 +480,7 @@ class Game:
                     if event.ui_element == self.save_btn:
                         overwrite_save(self.player,self.old_name)
                         self.saved_name = self.player.name
+                        save_achievement(self)
                         PopupPanel.show_message(
                             manager=self.manager,
                             text="Current session successfully saved.",
@@ -491,6 +505,7 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[5]
+                                    self.achievement.jobs_had += 1
                                 elif self.player.job.name !="Doctor":
                                     PopupPanel.show_message(
                                         manager=self.manager,
@@ -498,6 +513,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[5]
+                                    self.achievement.jobs_had += 1
+
                                 else:
                                     self.player.work(self)
                                 set_panel_text(self)
@@ -513,6 +530,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[6]
+                                    self.achievement.jobs_had += 1
+
                                 elif self.player.job.name !="Cook":
                                     PopupPanel.show_message(
                                         manager=self.manager,
@@ -520,6 +539,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[6]
+                                    self.achievement.jobs_had += 1
+
                                 else:
                                     self.player.work(self)
                                 set_panel_text(self)
@@ -535,6 +556,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[4]
+                                    self.achievement.jobs_had += 1
+
                                 elif self.player.job.name !="Programmer":
                                     PopupPanel.show_message(
                                         manager=self.manager,
@@ -542,6 +565,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[4]
+                                    self.achievement.jobs_had += 1
+
                                 else:
                                     self.player.work(self)
                                 set_panel_text(self)
@@ -556,6 +581,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[3]
+                                    self.achievement.jobs_had += 1
+
                                 elif self.player.job.name !="Accountant":
                                     PopupPanel.show_message(
                                         manager=self.manager,
@@ -563,6 +590,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[3]
+                                    self.achievement.jobs_had += 1
+
                                 else:
                                     self.player.work(self)
                                 set_panel_text(self)
@@ -582,6 +611,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[1]
+                                    self.achievement.jobs_had += 1
+
                                 elif self.player.job.name !="Salesman":
                                     PopupPanel.show_message(
                                         manager=self.manager,
@@ -589,6 +620,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[1]
+                                    self.achievement.jobs_had += 1
+
                                 else:
                                     self.player.work(self)
                                 set_panel_text(self)
@@ -605,6 +638,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[0]
+                                    self.achievement.jobs_had += 1
+
                                 elif self.player.job.name !="Cashier":
                                     PopupPanel.show_message(
                                         manager=self.manager,
@@ -612,6 +647,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[0]
+                                    self.achievement.jobs_had += 1
+
                                 else:
                                     self.player.work(self)
                                 set_panel_text(self)
@@ -628,6 +665,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[2]
+                                    self.achievement.jobs_had += 1
+
                                 elif self.player.job.name !="Clerk":
                                     PopupPanel.show_message(
                                         manager=self.manager,
@@ -635,6 +674,8 @@ class Game:
                                         screen_size=self.screen.get_size()
                                     )
                                     self.player.job = load_jobs()[2]
+                                    self.achievement.jobs_had += 1
+
                                 else:
                                     self.player.work(self)
                                 set_panel_text(self)
@@ -652,6 +693,7 @@ class Game:
                             if self.player.money >= (((20 * self.economy.inflation)/10) + 20):
                                 self.player.health += 25
                                 self.player.money -= (((20 * self.economy.inflation)/10) + 20)
+                                self.achievement.money_spent += (((20 * self.economy.inflation)/10) + 20)
                                 self.player.health = min(self.player.health,100)
                             else:
                                 PopupPanel.show_message(
@@ -664,6 +706,7 @@ class Game:
                         if self.in_burgershop:
                             if self.player.money >= (((20 * self.economy.inflation)/10) + 20):
                                 self.player.money -= (((20 * self.economy.inflation)/10) + 20)
+                                self.achievement.money_spent += (((20 * self.economy.inflation)/10) + 20)
                                 self.player.hunger += 25
                                 self.player.hunger = min(self.player.hunger,100)
                             else:
@@ -686,6 +729,8 @@ class Game:
                         if self.in_burgershop:
                             if self.player.money >=(((35 * self.economy.inflation)/10) + 35):
                                 self.player.money -= (((35 * self.economy.inflation)/10) + 35)
+                                self.achievement.money_spent += (((35 * self.economy.inflation)/10) + 35)
+
                                 self.player.hunger += 40
                                 self.player.hunger = min(self.player.hunger,100)
                             else:

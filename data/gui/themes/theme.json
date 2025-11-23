@@ -349,7 +349,7 @@
   },
   "#fps_text": {
     "colours": {
-      "normal_text": "#036300"
+      "normal_text": "#000"
     },
     "font": {
       "name": "Pixel",
@@ -387,23 +387,44 @@
     },
     "font": {
       "name": "Pixel Square",
-      "size": "60",
+      "size": "20",
       "regular_path": "./data/gui/fonts/Kenney Pixel Square.ttf"
     }
   },
   "#small_dead_label": {
     "colours": {
-      "normal_text": "#970001"
+      "normal_text": "#C00001"
     },
     "font": {
+      "name": "Pixel",
+      "size": "16",
+      "regular_path": "./data/gui/fonts/Kenney Blocks.ttf"
+    }
+  },
+  "#achievement_label": {
+    "font": {
+      "name": "Kenny",
+      "size": "19",
+      "regular_path": "./data/gui/fonts/Kenney Mini Square.ttf"
+    }
+  },
+  "#achievement_value": {
+    "font": {
+      "name": "Kenny",
+      "size": "19",
+      "regular_path": "./data/gui/fonts/Kenney Mini Square Mono.ttf"
+    }
+  },
+  "#testimonial_label": {
+    "font": {
       "name": "Pixel Square",
-      "size": "20",
+      "size": "18",
       "regular_path": "./data/gui/fonts/Kenney Pixel Square.ttf"
     }
   },
   "#credit_head": {
     "font": {
-      "name": "Roboto",
+      "name": "Kosugi",
       "size": "20",
       "regular_path": "./data/gui/fonts/Kosugi-Regular.ttf"
     }
