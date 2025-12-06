@@ -17,13 +17,14 @@ from subclass.ui_progress_bar import SmoothProgressBar
 from scripts.economy import *
 from scripts.achievements import *
 from scripts.path_utils import get_resource_path
+from scripts.npc_interaction import npc_dialog
 
 class Game:
     def __init__(self,menu,player):
         pygame.init()
         # Screen setup
         pygame.display.set_caption("Life of Py")
-        pygame_icon = pygame.image.load('life_of_py.png')
+        pygame_icon = pygame.image.load('life_of_py.ico')
         pygame.display.set_icon(pygame_icon)
         self.screen = pygame.display.set_mode((1024, 768))
         self.display = pygame.Surface((512, 384), pygame.SRCALPHA)  # Internal display for scaling
@@ -89,6 +90,7 @@ class Game:
 
         self.assets_sfx = {
             'ambience' : pygame.mixer.Sound('data/sfx/ambience.wav'),
+            'n-ambience' : pygame.mixer.Sound('data/sfx/night-ambience.wav'),
             'click' : pygame.mixer.Sound('data/sfx/click.wav'),
             'game_over' : pygame.mixer.Sound('data/sfx/game_over.wav'),
             'walk' : pygame.mixer.Sound('data/sfx/walk.wav'),
@@ -96,7 +98,8 @@ class Game:
             'pause' : pygame.mixer.Sound('data/sfx/pause.mp3'),
         }
 
-        self.assets_sfx['ambience'].set_volume(0.2)
+        self.assets_sfx['ambience'].set_volume(0.0)
+        self.assets_sfx['n-ambience'].set_volume(0.0)
         self.assets_sfx['click'].set_volume(1.0)
 
 
@@ -216,6 +219,8 @@ class Game:
     def run(self):
         circle_transition(self)
         self.assets_sfx['ambience'].play(-1)
+        self.assets_sfx['n-ambience'].play(-1)  
+
         if self.player.day ==1:
             save_economy(self)
             save_achievement(self)
@@ -372,7 +377,11 @@ class Game:
                                 elif self.player.pos[0] in range(10, 90) and self.player.pos[1] in range(177,235):
                                     if end_life(self):
                                         self.assets_sfx['game_over'].play()
+                                        self.assets_sfx['ambience'].stop()
+                                        self.assets_sfx['n-ambience'].stop()
                                         self.clickable = False
+                                        self.rate_btn.disable()
+                                        self.rate_btn.hide()
                                         self.save_btn.disable()
                                         self.save_btn.hide()
                                         self.sound_btn.disable()
@@ -393,9 +402,26 @@ class Game:
                                     change_location(self,'town')
                                 elif self.player.pos[0] in range(240, 270) and self.player.pos[1] in range(230, 250):
                                     change_location(self,'home')
+                                if self.player.pos[0] in range(350, 370) and self.player.pos[1] in range(300,310):
+                                    npc_dialog(self,1)
+                                elif self.player.pos[0] in range(545, 560) and self.player.pos[1] in range(300,310):
+                                    npc_dialog(self,2)
+                                elif self.player.pos[0] in range(525, 540) and self.player.pos[1] in range(200,215):
+                                    npc_dialog(self,3)
                             elif self.location == "town":
                                 if self.player.pos[0] in range(-15, 10) and self.player.pos[1] in range(163, 277):
                                     change_location(self,'suburb')
+
+                                if self.player.pos[0] in range(280, 325) and self.player.pos[1] in range(180, 190):
+                                    npc_dialog(self,4)
+                                elif self.player.pos[0] in range(421, 450) and self.player.pos[1] in range(155, 165):
+                                    npc_dialog(self,5)
+
+                                elif self.player.pos[0] in range(260, 315) and self.player.pos[1] in range(359, 404):
+                                    npc_dialog(self,6)
+
+                                elif self.player.pos[0] in range(69, 99) and self.player.pos[1] in range(518, 550):
+                                    npc_dialog(self,7)
 
                                 # DRUG STORE TRIGGER
                                 if self.player.pos[0] in range(49, 85) and self.player.pos[1] in range(150, 165):
@@ -417,7 +443,14 @@ class Game:
                                 elif self.player.pos[0] in range(65, 130) and self.player.pos[1] in range(481,500) :
                                     self.is_action_panel = not self.is_action_panel
                                     if not self.is_paused:
-                                        show_action(self,primary_action_type="accountant",secondary_action_type="bank")
+                                        if self.is_night:
+                                            PopupPanel.show_message(
+                                                manager=self.manager,
+                                                text=f"The bank is currently closed.",
+                                                screen_size=self.screen.get_size(),positive=False
+                                            )
+                                        else:
+                                            show_action(self,primary_action_type="accountant",secondary_action_type="bank")
 
 
 
@@ -460,7 +493,10 @@ class Game:
 
 
                     if event.ui_element == self.pause_menu_btn:
-                        self.assets_sfx['ambience'].stop()
+                        if not self.is_night:
+                            self.assets_sfx['ambience'].stop()
+                        else:
+                            self.assets_sfx['n-ambience'].stop()
                         self.assets_sfx['pause'].stop()
                         for item in self.menu.save_list:
                             item.hide()
@@ -805,7 +841,10 @@ class Game:
                                 text="SFX State: Muted.",
                                 screen_size=self.screen.get_size(), positive=False
                             )
-                            self.assets_sfx['ambience'].set_volume(0.0)
+                            if not self.is_night:
+                                self.assets_sfx['ambience'].set_volume(0.0)
+                            else:
+                                self.assets_sfx['n-ambience'].set_volume(0.0)
                             self.assets_sfx['pause'].set_volume(0.0)
                         else:
                             PopupPanel.show_message(
@@ -813,8 +852,11 @@ class Game:
                                 text="SFX State: Unmuted.",
                                 screen_size=self.screen.get_size(),
                             )
-                            self.assets_sfx['ambience'].set_volume(0.1)
-                            self.assets_sfx['pause'].set_volume(0.2)
+                            if not self.is_night:
+                                self.assets_sfx['ambience'].set_volume(0.1)
+                            else:
+                                self.assets_sfx['n-ambience'].set_volume(0.4)
+                            self.assets_sfx['pause'].set_volume(0.1)
 
                 self.manager.process_events(event)
 
@@ -834,7 +876,10 @@ class Game:
 
             elif self.location == "suburb":
                 if (self.player.pos[0] in range(240, 270) and self.player.pos[1] in range(230,250) or
-                        self.player.pos[0] in range(600, 704) and self.player.pos[1] in range(500,540)):
+                    self.player.pos[0] in range(600, 704) and self.player.pos[1] in range(500,540) or
+                    self.player.pos[0] in range(350, 370) and self.player.pos[1] in range(300,310) or #NPC1
+                    self.player.pos[0] in range(545, 560) and self.player.pos[1] in range(300,310) or #NPC2
+                    self.player.pos[0] in range(525, 540) and self.player.pos[1] in range(200,215)):  #NPC3
                     interact()
                 else:
                     self.clickable = False
@@ -844,7 +889,11 @@ class Game:
                     self.player.pos[0] in range(225, 272) and self.player.pos[1] in range(161,170) or
                     self.player.pos[0] in range(449, 485) and self.player.pos[1] in range(481,490) or
                     self.player.pos[0] in range(65, 130) and self.player.pos[1] in range(481,500) or
-                    self.player.pos[0] in range(-15, 10) and self.player.pos[1] in range(163, 277)
+                    self.player.pos[0] in range(-15, 10) and self.player.pos[1] in range(163, 277) or
+                    self.player.pos[0] in range(280, 325) and self.player.pos[1] in range(180, 190) or
+                    self.player.pos[0] in range(421, 450) and self.player.pos[1] in range(155, 165) or
+                    self.player.pos[0] in range(260, 315) and self.player.pos[1] in range(359, 404) or
+                    self.player.pos[0] in range(69, 99) and self.player.pos[1] in range(518, 550)
                     ) :
                     interact()
                 else:
@@ -859,5 +908,4 @@ class Game:
             self.smooth_lvl_bar.update(dt)
             self.manager.update(dt)
             pygame.display.update()
-
 

@@ -1,0 +1,266 @@
+{
+  "npcs": {
+    "1": {
+      "name": "Linda",
+      "day_dialogs": [
+        "Is that your house? I doubt it.",
+        "I have important things to do.",
+        "My husband is very rich.",
+        "Did you see the latest mansion on the hill?",
+        "I don't have time for this.",
+        "Some people just don't have class.",
+        "Excuse me, I need to get through.",
+        "Your outfit could use some work.",
+        "I have a spa appointment in twenty minutes.",
+        "Real estate prices are through the roof.",
+        "Do you even know who I am?",
+        "Such pedestrian concerns...",
+        "My country club called - they need me.",
+        "This neighborhood is getting so common."
+      ],
+      "night_dialogs": [
+        "Do you mind?! I'm trying to get to my mansion.",
+        "This better be important.",
+        "Why are you bothering me at this hour?",
+        "I should be home by now.",
+        "Move along, stranger.",
+        "The chauffeur is waiting.",
+        "It's far too late for this nonsense.",
+        "Unhand me at once!",
+        "Security! SECURITY!",
+        "My lawyer will hear about this."
+      ],
+      "special_dialogs": {
+        "early_game": []
+      }
+    },
+    "2": {
+      "name": "Amy",
+      "day_dialogs": [
+        "Hi! Good morning.",
+        "Did you see that bird over there?",
+        "What a lovely day.",
+        "The weather is so nice today!",
+        "Have you eaten breakfast yet?",
+        "I love exploring this area.",
+        "Everything seems so peaceful.",
+        "The sun feels wonderful today.",
+        "I found the most beautiful flower earlier.",
+        "Have you tried the new cafe downtown?",
+        "What a perfect day to go for a walk!",
+        "The clouds are so fluffy today.",
+        "I'm feeling great this morning!",
+        "Care to enjoy the weather with me?",
+        "The birds are singing so beautifully."
+      ],
+      "night_dialogs": [
+        "I agree, it's pretty dark this time of the day.",
+        "The stars look beautiful tonight.",
+        "I should be heading home soon.",
+        "The night air is so refreshing.",
+        "I hope the darkness doesn't last too long.",
+        "The moon is looking lovely.",
+        "Night walks are so peaceful.",
+        "I'm enjoying the quiet of the evening.",
+        "The stars are extra bright tonight.",
+        "There's something magical about nighttime."
+      ],
+      "special_dialogs": {
+        "early_game": []
+      }
+    },
+    "3": {
+      "name": "Bob",
+      "day_dialogs": [
+        "Oh howdy, neighbor.",
+        "I'm thinking of getting a truck.",
+        "Did you check the market today?",
+        "Got any spare parts in that garage?",
+        "The weather's been great for work.",
+        "I've been tinkering with my old engine.",
+        "You looking for work, friend?",
+        "Trade business has been steady lately.",
+        "Been working on the fence all morning.",
+        "Fixing up the house, you know?",
+        "Nothing beats honest work.",
+        "The garden's looking good this year.",
+        "How's business treating you?",
+        "Want to grab a beer after work?",
+        "Just finished a big job."
+      ],
+      "night_dialogs": [
+        "I'll get a job, I know.",
+        "Time to call it a day.",
+        "The work never stops around here.",
+        "Getting too dark to fix anything now.",
+        "I should head home soon.",
+        "Been a long day of labor.",
+        "My back is killing me.",
+        "Nothing like rest after hard work.",
+        "Heading in for dinner soon.",
+        "The wife's probably got supper ready.",
+        "Gonna sleep well tonight.",
+        "Early morning tomorrow, I reckon."
+      ],
+      "special_dialogs": {
+        "early_game": [
+          "I haven't seen you around before.",
+          "Welcome to the neighborhood!",
+          "You new to the area?",
+          "Fresh face around here, huh?",
+          "Don't think we've met before."
+        ]
+      }
+    },
+    "4": {
+      "name": "Pregnant Mom",
+      "day_dialogs": [
+        "Alright, I'll get you that new toy.",
+        "This is my daughter, Molly.",
+        "Don't touch that!!",
+        "Oh you startled me!, this is my daughter",
+        "Look who isn't behaving.",
+        "Molly, what did I tell you?",
+        "Kids these days, am I right?",
+        "Parenting is quite the adventure.",
+        "She's been asking for ice cream all day.",
+        "Molly needs new shoes already.",
+        "Children grow so fast.",
+        "We're heading to the park in a bit.",
+        "Motherhood is exhausting!",
+        "Molly had a good day at school.",
+        "Being a parent never gets easier.",
+        "Just trying to keep up with her energy."
+      ],
+      "night_dialogs": [
+        "Molly should be asleep by now.",
+        "Finally got her down for bed.",
+        "Hopefully she'll sleep through the night.",
+        "Bedtime stories are exhausting.",
+        "I need some rest myself.",
+        "The house is finally quiet.",
+        "Peace and quiet at last!",
+        "Thank goodness for naptime.",
+        "She wore me out today.",
+        "Time for a well-deserved break.",
+        "Molly's been particularly fussy tonight.",
+        "I hope she sleeps well."
+      ],
+      "special_dialogs": {
+        "early_game": []
+      }
+    },
+    "5": {
+      "name": "Tony",
+      "day_dialogs": [
+        "Looking for some directions to the bank.",
+        "I swear I know where I'm going.",
+        "Got any spare change I could use?",
+        "I got kids at home to feed...",
+        "Do you know what street this is?",
+        "Times have been tough lately.",
+        "Anyone hiring around here?",
+        "Trying to make ends meet, you know?",
+        "Can't catch a break these days.",
+        "Anybody got work? Any work?",
+        "Looking for an odd job or two.",
+        "Every penny counts right now.",
+        "Been walking all day looking for work.",
+        "Things will turn around soon, I hope.",
+        "My kids deserve better than this.",
+        "One good day, that's all I need."
+      ],
+      "night_dialogs": [
+        "Not much out here at night.",
+        "Should find some shelter soon.",
+        "The nights get cold out here.",
+        "Anyone got a warm place to sleep?",
+        "Tomorrow's another day to find work.",
+        "At least I made it through another day.",
+        "Sleep comes easy when you're exhausted.",
+        "Gotta conserve my energy.",
+        "The street's emptying out.",
+        "Another lonely night.",
+        "Maybe things'll be different tomorrow.",
+        "Just gotta keep believing."
+      ],
+      "special_dialogs": {
+        "early_game": []
+      }
+    },
+    "6": {
+      "name": "Group",
+      "day_dialogs": [
+        "(Unintelligible Chatter)",
+        "(Loud conversation in the distance)",
+        "(Group laughing together)",
+        "(Sounds of discussion)",
+        "(Crowd murmur)",
+        "(Overlapping voices)",
+        "(Friendly banter)",
+        "(Animated discussion)",
+        "(Several people talking at once)",
+        "(Excited chatter)",
+        "(Mixed laughter and conversation)",
+        "(Background noise)",
+        "(People engaging in heated debate)",
+        "(Casual neighborhood chat)",
+        "(Group enjoying themselves)"
+      ],
+      "night_dialogs": [
+        "(Quiet voices)",
+        "(Whispered conversation)",
+        "(Muffled talking)",
+        "(People gathering)",
+        "(Hushed chatter)",
+        "(Soft murmuring)",
+        "(Low conversation)",
+        "(Distant voices)",
+        "(Quiet discussion)",
+        "(Evening socializing)",
+        "(Subdued talking)",
+        "(Night time gathering)"
+      ],
+      "special_dialogs": {
+        "early_game": []
+      }
+    },
+    "7": {
+      "name": "Security",
+      "day_dialogs": [
+        "Did you know the bank is only open during the day.",
+        "Have a good day.",
+        "Your deposit is safe with us.",
+        "Welcome to the bank.",
+        "Security is our top priority.",
+        "We're here to help with your finances.",
+        "Everything is secure here.",
+        "Banking services at your convenience.",
+        "Please watch your step.",
+        "We appreciate your business.",
+        "May I see your identification?",
+        "Our team is ready to assist you.",
+        "Remember to keep your PIN secure.",
+        "Transaction limits apply.",
+        "We offer the best rates in town."
+      ],
+      "night_dialogs": [
+        "Come back tomorrow, we're closed.",
+        "Bank's closed for the night.",
+        "See you during business hours.",
+        "Everything's locked up tight.",
+        "We open again in the morning.",
+        "Please return during business hours.",
+        "Security protocols are active.",
+        "Alarm system is armed.",
+        "Night shift takes over soon.",
+        "We're not open for night deposits.",
+        "Safe and secure until morning.",
+        "Come back when we're open."
+      ],
+      "special_dialogs": {
+        "early_game": []
+      }
+    }
+  }
+}

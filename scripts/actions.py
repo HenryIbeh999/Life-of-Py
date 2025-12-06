@@ -183,7 +183,9 @@ def set_panel_text(game):
 def pause(game):
     if game.is_paused is True:
         game.clickable = False
-        game.assets_sfx['ambience'].stop()
+        game.assets_sfx['ambience'].set_volume(0.0)
+
+        game.assets_sfx['n-ambience'].set_volume(0.0)
         game.assets_sfx['pause'].play(-1)
         game.is_action_panel = False
         game.action_panel.hide()
@@ -219,7 +221,10 @@ def pause(game):
     else:
         game.clickable = True
         game.assets_sfx['pause'].stop()
-        game.assets_sfx['ambience'].play(-1)
+        if not game.is_night:
+            game.assets_sfx['ambience'].set_volume(0.1)
+        else:
+            game.assets_sfx['n-ambience'].set_volume(0.4)
         game.pause_panel.hide()
         game.pause_load_btn.hide()
         game.pause_menu_btn.hide()
@@ -249,9 +254,19 @@ def check_time(game):
             else:
                 game.assets['location'] = load_image(f'night_{game.location}.jpg')
 
-    elif game.player.energy > 30:
+            game.assets_sfx['n-ambience'].set_volume(0.4)
+            game.assets_sfx['ambience'].set_volume(0.0)
+
+
+
+
+    elif game.player.energy > 40:
         game.is_night = False
         game.assets['location'] = load_image(f'{game.location}.png')
+        if not game.is_night:
+            game.assets_sfx['n-ambience'].set_volume(0.0)
+            game.assets_sfx['ambience'].set_volume(0.1)
+
 
 def circle_transition(game, duration=1000):
     check_time(game)
