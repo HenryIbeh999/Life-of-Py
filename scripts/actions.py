@@ -181,10 +181,10 @@ def set_panel_text(game):
 
 
 def pause(game):
-    if game.is_paused is True:
+    if game.is_paused:
         game.clickable = False
-        game.assets_sfx['ambience'].set_volume(0.0)
 
+        game.assets_sfx['ambience'].set_volume(0.0)
         game.assets_sfx['n-ambience'].set_volume(0.0)
         game.assets_sfx['pause'].play(-1)
         game.is_action_panel = False
@@ -221,9 +221,8 @@ def pause(game):
     else:
         game.clickable = True
         game.assets_sfx['pause'].stop()
-        if not game.is_night:
+        if not game.mute:
             game.assets_sfx['ambience'].set_volume(0.1)
-        else:
             game.assets_sfx['n-ambience'].set_volume(0.4)
         game.pause_panel.hide()
         game.pause_load_btn.hide()
@@ -253,9 +252,10 @@ def check_time(game):
                 game.assets['location'] = load_image(f'night_{game.location}.png')
             else:
                 game.assets['location'] = load_image(f'night_{game.location}.jpg')
-
-            game.assets_sfx['n-ambience'].set_volume(0.4)
-            game.assets_sfx['ambience'].set_volume(0.0)
+            if not game.is_paused:
+                if not game.mute:
+                    game.assets_sfx['n-ambience'].set_volume(0.4)
+                    game.assets_sfx['ambience'].set_volume(0.0)
 
 
 
@@ -264,8 +264,11 @@ def check_time(game):
         game.is_night = False
         game.assets['location'] = load_image(f'{game.location}.png')
         if not game.is_night:
-            game.assets_sfx['n-ambience'].set_volume(0.0)
-            game.assets_sfx['ambience'].set_volume(0.1)
+
+            if not game.is_paused:
+                if not game.mute:
+                    game.assets_sfx['n-ambience'].set_volume(0.0)
+                    game.assets_sfx['ambience'].set_volume(0.1)
 
 
 def circle_transition(game, duration=1000):
@@ -374,6 +377,7 @@ def init_chart(game):
 def advance_day(game):
     game.player.energy = 100.0
     game.player.day += 1
+    game.achievement.days_lived = game.player.day
     game.is_rate_panel = False
     game.chart_panel.hide()
     game.chart_image.hide()
@@ -382,6 +386,11 @@ def advance_day(game):
     save_economy(game)
     update_csv(game)
     circle_transition(game)
+    print(game.achievement.money_made)
+    print(game.achievement.money_spent)
+    print(game.achievement.days_lived)
+    print(game.achievement.taxes_paid)
+    print(game.achievement.level)
 
     if game.player.day % 2 == 0:
         if game.player.deposit > 0:
@@ -393,15 +402,7 @@ def advance_day(game):
 
 
 def end_life(game):
-    if 0 < game.player.health <= 40:
-        PopupPanel.show_message(
-            manager=game.manager,
-            text="You really need a health checkup!",
-            screen_size=game.screen.get_size(), positive=False
-        )
-        return False
-
-    elif game.player.health == 0.0 or game.player.hunger == 0.0:
+    if game.player.health == 0.0 or game.player.hunger == 0.0:
         dead_panel = AnimatedPanel(relative_rect=pygame.Rect(0,0,400,500),manager=game.manager,anchors={'center': 'center'},object_id=ObjectID(class_id="@panel", object_id="#death_panel"))
         small_dead_panel =AnimatedPanel(relative_rect=pygame.Rect(0,0,300,300),manager=game.manager,container=dead_panel,anchors={'center': 'center'},object_id=ObjectID(class_id="@panel", object_id="#death_panel"))
         dead_panel.slide_to((300, 0), duration=1.0, easing=pytweening.easeOutBack)
@@ -468,6 +469,14 @@ def end_life(game):
         game.player.die()
 
         return True
+
+    elif 0 < game.player.health <= 40:
+        PopupPanel.show_message(
+            manager=game.manager,
+            text="You really need a health checkup!",
+            screen_size=game.screen.get_size(), positive=False
+        )
+        return False
 
 
 def tax_player(game):

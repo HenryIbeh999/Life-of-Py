@@ -33,6 +33,9 @@ class Game:
         self.movement = [False,False,False,False] #Movement flags for left , right, top, bottom
         self.manager = pygame_gui.UIManager((1024, 768), theme_path=get_resource_path("data/gui/themes/theme.json"))
         self.player = player
+        self.player.energy = 0
+        self.player.hunger = 0
+        self.player.health = 30
         self.menu = menu
         self.old_name = self.player.name
         self.saved_name = self.player.name
@@ -327,6 +330,7 @@ class Game:
             if self.player.level_progress >= 100.0:
                 self.player.level_progress = 0.0
                 self.player.level += 1
+                self.achievement.level = self.player.level
                 PopupPanel.show_message(manager=self.manager,
                                         text=f"You have leveled up to LVL {self.player.level} !",
                                         screen_size=self.screen.get_size(),is_lvl_up=True)
@@ -841,10 +845,8 @@ class Game:
                                 text="SFX State: Muted.",
                                 screen_size=self.screen.get_size(), positive=False
                             )
-                            if not self.is_night:
-                                self.assets_sfx['ambience'].set_volume(0.0)
-                            else:
-                                self.assets_sfx['n-ambience'].set_volume(0.0)
+                            self.assets_sfx['ambience'].set_volume(0.0)
+                            self.assets_sfx['n-ambience'].set_volume(0.0)
                             self.assets_sfx['pause'].set_volume(0.0)
                         else:
                             PopupPanel.show_message(
@@ -852,9 +854,8 @@ class Game:
                                 text="SFX State: Unmuted.",
                                 screen_size=self.screen.get_size(),
                             )
-                            if not self.is_night:
+                            if not self.is_paused:
                                 self.assets_sfx['ambience'].set_volume(0.1)
-                            else:
                                 self.assets_sfx['n-ambience'].set_volume(0.4)
                             self.assets_sfx['pause'].set_volume(0.1)
 

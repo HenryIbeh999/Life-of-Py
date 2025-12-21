@@ -136,7 +136,7 @@ def query_save(menu):
                 menu.button_space += 70
                 save_list.append(UIButton(relative_rect=pygame.Rect(0, menu.button_space, 200, 50), text=f"{save.name}",
                                           manager=menu.manager, anchors={'centerx': 'centerx'},
-                                          object_id=ObjectID(class_id='@small_button', object_id='#menu_load_button'),
+                                          object_id=ObjectID(class_id='@menu_button', object_id='#menu_load_button'),
                                           container=menu.load_panel))
             return save_list
 

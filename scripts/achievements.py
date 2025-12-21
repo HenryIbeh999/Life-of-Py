@@ -51,9 +51,9 @@ def save_achievement(game):
                 money_made=round(game.achievement.money_made,2),
                 money_spent=round(game.achievement.money_spent,2),
                 taxes_paid=round(game.achievement.taxes_paid,2),
-                days_lived=game.player.day,
+                days_lived=game.achievement.days_lived,
                 jobs_had=game.achievement.jobs_had,
-                level=game.player.level,
+                level=game.achievement.level,
 
             )
         session.execute(delete(Achievement).where(Achievement.name==game.player.name))

@@ -1,11 +1,33 @@
 {
   "@small_button": {
     "colours": {
-      "normal_border": "#000",
+      "normal_border": "Black",
       "normal_bg": "#6eac4fcb,#98d867d8,270",
       "normal_text": "Black",
       "hovered_bg": "#7fd36cd6,#8db866ff,270",
       "hovered_border": "Black",
+      "active_bg": "#95b190cb,#9bc07fff,270",
+      "hovered_text": "Black",
+      "active_border": "#000"
+    },
+    "font": {
+      "name": "Pixel",
+      "size": 20,
+      "regular_path": "./data/gui/fonts/Kenney Future.ttf"
+    },
+    "misc": {
+      "shape": "rounded_rectangle",
+      "shape_corner_radius": "10",
+      "border_width": "2"
+    }
+  },
+  "@menu_button": {
+    "colours": {
+      "normal_border": "#582422,#321917, 270",
+      "normal_bg": "#6eac4fcb,#98d867d8,270",
+      "normal_text": "Black",
+      "hovered_bg": "#7fd36cd6,#8db866ff,270",
+      "hovered_border": "#582422,#321917, 270",
       "active_bg": "#95b190cb,#9bc07fff,270",
       "hovered_text": "Black",
       "active_border": "#000"
@@ -241,10 +263,11 @@
   "#menu_panel": {
     "colours": {
       "dark_bg": "#82b868e1,#98d867d8,270",
-      "normal_border": "Black"
+      "normal_border": "#3b702be3,#313d27e3,270"
     },
     "misc": {
-      "shape_corner_radius": "15"
+      "shape_corner_radius": "15",
+      "border_width": "3"
     }
   },
   "#pause_panel": {

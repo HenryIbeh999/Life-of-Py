@@ -30,26 +30,29 @@ class Menu:
         self.load_mode = False
         self.delete_mode = False
         self.button_space = 0
+        self.mute = False
+
 
 
         # ******************** UI **********************#
 
         self.menu_panel = UIPanel(relative_rect=pygame.Rect( 0, 0, 400, 400),manager=self.manager,anchors={'center': 'center'},object_id=ObjectID(class_id="@panel", object_id="#menu_panel"))
         self.prompt_query = UITextEntryLine(relative_rect=pygame.Rect(0, 40, 600, 40), manager=self.manager,placeholder_text="Enter a name here", anchors={'centerx': 'centerx'},object_id=ObjectID(class_id="@input", object_id="#new_save_input"),visible=False)
-        self.prompt_cancel = UIButton(relative_rect=pygame.Rect(95, 40, 100,40),text='Cancel',manager=self.manager,object_id = ObjectID(class_id='@small_button', object_id='#prompt_cancel_button'),visible=False)
-        self.prompt_confirm = UIButton(relative_rect=pygame.Rect(830, 40, 100,40),text='Start',manager=self.manager,object_id = ObjectID(class_id='@small_button', object_id='#prompt_start_button'),visible=False)
+        self.prompt_cancel = UIButton(relative_rect=pygame.Rect(95, 40, 100,40),text='Cancel',manager=self.manager,object_id = ObjectID(class_id='@menu_button', object_id='#prompt_cancel_button'),visible=False)
+        self.prompt_confirm = UIButton(relative_rect=pygame.Rect(830, 40, 100,40),text='Start',manager=self.manager,object_id = ObjectID(class_id='@menu_button', object_id='#prompt_start_button'),visible=False)
         self.male_check = UICheckBox(relative_rect=pygame.Rect(220, 100, 40,40),text='Male',manager=self.manager,object_id = ObjectID(class_id='@check_box', object_id='#check'),visible=False)
         self.female_check = UICheckBox(relative_rect=pygame.Rect(320, 100, 40,40),text='Female',manager=self.manager,object_id = ObjectID(class_id='@check_box', object_id='#check'),visible=False)
+        self.sound_btn = UIButton(relative_rect=pygame.Rect(10,15,30,30),text="",manager=self.manager,container=self.menu_panel,object_id=ObjectID(class_id="@misc_button",object_id="#sound_button"))
 
-        self.new_save_btn = UIButton(relative_rect=pygame.Rect(0,30, 200, 50),text='New Game',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@small_button', object_id='#new_save_button'),container=self.menu_panel)
-        self.load_btn = UIButton(relative_rect=pygame.Rect(0,100, 200, 50),text='Load',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@small_button', object_id='#load_button'),container=self.menu_panel)
-        self.delete_btn = UIButton(relative_rect=pygame.Rect(0,170, 200, 50),text='Delete',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@small_button', object_id='#load_button'),container=self.menu_panel)
-        self.quit_btn = UIButton(relative_rect=pygame.Rect(0,240, 200, 50),text='Quit',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@small_button', object_id='#quit_button'),container=self.menu_panel)
+        self.new_save_btn = UIButton(relative_rect=pygame.Rect(0,30, 200, 50),text='New Game',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@menu_button', object_id='#new_save_button'),container=self.menu_panel)
+        self.load_btn = UIButton(relative_rect=pygame.Rect(0,100, 200, 50),text='Load',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@menu_button', object_id='#load_button'),container=self.menu_panel)
+        self.delete_btn = UIButton(relative_rect=pygame.Rect(0,170, 200, 50),text='Delete',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@menu_button', object_id='#load_button'),container=self.menu_panel)
+        self.quit_btn = UIButton(relative_rect=pygame.Rect(0,240, 200, 50),text='Quit',manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@menu_button', object_id='#quit_button'),container=self.menu_panel)
 
         self.extra_label = UILabel(relative_rect=pygame.Rect(0, 350, -1, -1),text="Life Of Py",manager=self.manager,anchors={'centerx':'centerx'},container=self.menu_panel,object_id=ObjectID(class_id="@menu_text",object_id="#menu_text"))
         self.version_label = UILabel(relative_rect=pygame.Rect(0, 630, -1, -1),text="v1.00",manager=self.manager,anchors={'centerx':'centerx'},object_id=ObjectID(class_id="@menu_text",object_id="#version_text"))
         self.load_panel = UIPanel(relative_rect=pygame.Rect(0,0,450,500),manager=self.manager,anchors={'center': 'center'},object_id=ObjectID(class_id="@panel", object_id="#load_panel"),visible=False)
-        self.back_btn = UIButton(relative_rect=pygame.Rect(0,400,200,50),text="Back",manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@small_button', object_id='#back_button'),container=self.load_panel)
+        self.back_btn = UIButton(relative_rect=pygame.Rect(0,400,200,50),text="Back",manager=self.manager,anchors={'centerx':'centerx'},object_id = ObjectID(class_id='@menu_button', object_id='#back_button'),container=self.load_panel)
         self.reload_save()
 
         # ******************** UI **********************#
@@ -200,6 +203,12 @@ class Menu:
                 self.back_btn.hide()
                 self.hide_save_buttons()
 
+            if self.mute:
+                pygame.mixer.music.set_volume(0.0)
+            else:
+                pygame.mixer.music.set_volume(0.8)
+
+
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
                     is_running = False
@@ -274,6 +283,9 @@ class Menu:
                         self.back_btn.hide()
                         for item in self.save_list:
                             item.visible= False
+
+                    if event.ui_element == self.sound_btn:
+                        self.mute = not self.mute
 
                     if event.ui_element == self.prompt_confirm:
                         if len(self.prompt_query.text) > 4:
