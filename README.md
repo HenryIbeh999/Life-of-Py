@@ -44,20 +44,16 @@ You can pursue one of **7 different jobs**, each with unique salary and requirem
 - Your salary is adjusted by the economy's `salary_index` (inflation can reduce your real earnings!)
 - You advance in levels by consistently working and maintaining your character
 
-### Economy System
+## Economy System
 
-Here's where it gets interesting. Your personal finances exist within a **living, breathing economy** that simulates real-world economic pressure:
-
+### It's a very simplified version of what you would call a _working economy_
 #### Economic Indicators (Updated Daily)
-- **Inflation**: Affects prices and real wages
-- **Interest Rate**: Affects bank deposits
+- **Inflation**: Affects prices and actual value of wages
+- **Interest Rate**: Affects interest gotten from bank deposits
 - **Salary Index**: Multiplier applied to your job salary
-- **Tax Rate**: Eventually affects your take-home (framework for future expansion)
+- **Tax Rate**: Eventually affects the rate in which you're taxed
 
-#### How It Affects You
-Your actual daily salary = `base_salary × salary_index × inflation`
-
-If inflation jumps from 1.0 to 1.5, your $50/day job suddenly feels like $33/day in real purchasing power. The economy graph lets you visualize these trends over time.
+The economy graph lets you visualize these trends over time.
 
 ### Day/Night Cycle
 
@@ -69,22 +65,19 @@ The game operates on a day-based system:
 
 
 ### Stat Management
+One of the last feature I implemented was the achievement system that shows you some
+interesting statistics over the course of the game till you **DIE**
 
 Your character's stats decay over time and in specific situations:
 
-| Stat | Decreases | Restores |
-|------|-----------|----------|
-| **Energy** | Working | Sleep (nighttime rest) |
-| **Health** | Working | Time at home, specific items |
-| **Hunger** | Each day, more if working | Eating at burger shops |
-| **Money** | Purchasing items | Working, finding money |
+| Stat | Decreases | Restores                     |
+|------|-----------|------------------------------|
+| **Energy** | Working | Sleep (nighttime rest)       |
+| **Health** | Working | Getting a health check-up    |
+| **Hunger** | Each day, more if working | Eating at burger shops       |
+| **Money** | Purchasing items | Working and gaining interest |
 
-If any stat hits zero, your character faces consequences:
-- **Energy at 0**: Can't work (must sleep)
-- **Health at 0**: Game Over
-- **Hunger at 0**: Health degrades faster
 
----
 
 ## Controls
 
@@ -101,18 +94,14 @@ If any stat hits zero, your character faces consequences:
 ### Save/Load
 - Manual save via menu (optional per-day)
 - If you fail to save, the economy graph resets to the last existing save point
-- Load previous saves from main menu
+- Load previous saves from main menu or in-game
 
 ---
 
 ## Progression & Goals
 
-It is a sandbox game, but natural objectives emerge:
+It is a sandbox game, I don't know what to tell you...
 
-1. **Early Game**: Survive the first week, pick a job, start saving, try not to die
-2. **Mid Game**: Accumulate $1000+, advance to better jobs (level up through experience)
-3. **Late Game**: Exploit economy cycles, maximize salary index, become wealthy
-4. **Sandbox**: Watch the economy evolve, experiment with different career paths
 
 Your progress is tracked in **economy CSV files** that record daily inflation, interest rates, and salary multipliers—useful for analyzing what worked and what didn't across runs.
 
@@ -129,6 +118,7 @@ Life of Py/
 │   └── save/
 │       ├── save.db              (main player data)
 │       ├── economy.db           (economic simulation state)
+│       ├── achievements.db      (acccumulated player stats)
 │       └── {PlayerName}_economy.csv  (daily records)
 ```
 
@@ -137,6 +127,7 @@ Life of Py/
 C:\Users\{YourUsername}\AppData\Roaming\LifeOfPy\
 ├── save.db                      (main player data)
 ├── economy.db                   (economic simulation state)
+├── achievements.db              (acccumulated player stats)
 └── {PlayerName}_economy.csv     (daily records)
 ```
 
@@ -155,47 +146,6 @@ C:\Users\{YourUsername}\AppData\Roaming\LifeOfPy\
 
 
 ---
-
-## Known Quirks & Features
-
-### Features
-- **Dynamic Economy**: Inflation actually affects your salary (not just cosmetic)
-- **Gender-Specific Sprites**: Character appearance changes based on gender selection
-- **NPC System**: NPCs with idle animations populate the world (10 different NPCs)
-- **Day Counter**: Persistent day tracking across saves
-- **Audio Design**: Ambient sounds, click feedback, work SFX
-
-### Limitations
-- No multiplayer (single-player only)
-- Limited NPC dialogue (they're there but don't talk much)
-- Economy doesn't fully respond to player actions yet (planned for future versions)
-- No permadeath (health at 0 = restart, but saves remain)
-
----
-
-## Tips & Tricks
-
-### Money Management
-- **Start small**: Pick Cashier or Salesman, build a safety net of $500
-- **Watch the economy**: If salary_index drops, consider taking higher-cost jobs
-- **Bank deposits**: Use the bank to earn interest (though rates fluctuate)
-
-### Leveling Up
-- **Consistency pays**: Work the same job repeatedly to advance levels
-- **Higher levels = better jobs**: Level 15 unlocks Doctor job ($105/day!)
-- **Respec**: You can switch jobs at any time (no permanent commitment)
-
-### Stat Management
-- **Plan your day**: Check energy before committing to work
-- **Eat proactively**: Burger shops are lifesavers when hunger approaches zero
-- **Sleep schedule**: Rest at home before your energy drops too low
-- **Health is currency**: Protect it like money—once it's gone, run's over
-
-### Economy Reading
-- **Graph the trends**: Open the economy graph to see what's coming
-- **Inflation spikes**: When inflation rises, wages stay the same but feel smaller
-- **Interest rates**: Low rates = your bank deposits earn less
-- **Plan ahead**: If you see inflation rising, save aggressively beforehand
 
 ---
 
@@ -251,7 +201,7 @@ Add sprite folders to `data/images/entities/npc/npc-N/` and  `data/images/tiles/
 
 ### Custom Economy Rules
 Modify `scripts/economy.py` to change how inflation/interest rates are calculated.
-Don't go too crazy...
+The default I set is quite moderate and slightly spontaneous.
 
 ---
 
@@ -260,8 +210,9 @@ Don't go too crazy...
 **Life of Py** was built with:
 - **Pygame-CE**: Community-maintained Pygame fork
 - **pygame_gui**: Modern UI framework for Pygame
-- **SQLAlchemy**: Elegant database ORM
+- **SQLAlchemy**: Database ORM
 - **Seaborn/Matplotlib**: Data visualization
+- **Credits**: Credits were given in the credits folder
 - **Pixel-Art**: All sprites were made from https://liberatedpixelcup.github.io/Universal-LPC-Spritesheet-Character-Generator/
 
 
@@ -269,7 +220,7 @@ Don't go too crazy...
 
 ## License & Support
 
-This is a passion project built as a learning exercise. Play it, break it, mod it—the code is relatively clean and well-commented.
+I like open source so this is whatever. Have fun poking around the code base
 
 If you find bugs or have ideas, feel free to open an issue or submit a pull request!
 
@@ -279,4 +230,4 @@ If you find bugs or have ideas, feel free to open an issue or submit a pull requ
 
 I'm a first-year Software Engineering student. This was a fun learning project that took about a month to complete. It heavily leverages OOP principles, database management with SQLAlchemy, data visualization with matplotlib/seaborn, game event scripting, and some creative problem-solving along the way.
 
-The goal was to combine economic simulation with an engaging gameplay loop.
+The goal was to combine economic simulation with an **engaging** gameplay loop.

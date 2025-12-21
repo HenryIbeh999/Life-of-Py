@@ -277,7 +277,12 @@
   },
   "#load_panel": {
     "colours": {
-      "dark_bg": "#82b868e1,#98d867d8,270"
+      "dark_bg": "#82b868e1,#98d867d8,270",
+      "normal_border": "#3b702be3,#313d27e3,270"
+    },
+    "misc": {
+      "shape_corner_radius": "15",
+      "border_width": "3"
     }
   },
   "#action_panel": {

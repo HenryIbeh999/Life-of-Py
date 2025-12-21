@@ -376,6 +376,7 @@ def init_chart(game):
 
 def advance_day(game):
     game.player.energy = 100.0
+    game.player.hunger -= 20
     game.player.day += 1
     game.achievement.days_lived = game.player.day
     game.is_rate_panel = False
