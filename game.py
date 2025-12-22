@@ -33,9 +33,6 @@ class Game:
         self.movement = [False,False,False,False] #Movement flags for left , right, top, bottom
         self.manager = pygame_gui.UIManager((1024, 768), theme_path=get_resource_path("data/gui/themes/theme.json"))
         self.player = player
-        self.player.energy = 0
-        self.player.hunger = 0
-        self.player.health = 30
         self.menu = menu
         self.old_name = self.player.name
         self.saved_name = self.player.name
