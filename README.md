@@ -65,8 +65,8 @@ The game operates on a day-based system:
 
 
 ### Stat Management
-One of the last feature I implemented was the achievement system that shows you some
-interesting statistics over the course of the game till you **DIE**
+One of the last features I implemented was the achievement system that shows you some
+interesting statistics over the course of the game until you **DIE**
 
 Your character's stats decay over time and in specific situations:
 
@@ -141,7 +141,7 @@ C:\Users\{YourUsername}\AppData\Roaming\LifeOfPy\
 - **Database**: SQLAlchemy ORM with SQLite
 - **Physics**: Simple AABB tile-based collision detection
 - **Resolution**: 512×384 internal (2× upscaled to 1024×768)
-- **Performance**: Targets 60 FPS on modest hardware (Intel HD 4400+)
+- **Performance**: Targets 60 FPS on modest hardware (Intel HD 4400+ is what I tested it on.)
 
 
 
@@ -153,11 +153,11 @@ C:\Users\{YourUsername}\AppData\Roaming\LifeOfPy\
 
 ### Saves Not Appearing
 **Problem**: You created a save but it doesn't show in Load menu.
-**Solution**: Ensure you're saving with a unique name. Check `AppData\Local\LifeOfPy\` to verify files exist.
+**Solution**: Ensure you're saving with a unique name. Check `AppData\Local\LifeOfPy\` if `AppData\Roaming\LifeOfPy\` doesn't exist.
 
 ### Game Crashes on Startup
 **Problem**: "Cannot find theme.json" or similar error.
-**Solution**: If using the .exe, ensure the `data/` folder exists in the same directory. Rebuild with PyInstaller if needed.
+**Solution**: If using the .exe, ensure the `data/` folder exists in the same directory. Rebuild with PyInstaller if needed. But I configured the directories and PyInstaller parameters pretty well.
 
 ### Performance Issues
 **Problem**: Game feels choppy or slow.
@@ -220,7 +220,7 @@ The default I set is quite moderate and slightly spontaneous.
 
 ## License & Support
 
-I like open source so this is whatever. Have fun poking around the code base
+I like open source so this is ...whatever. Have fun poking around the code base
 
 If you find bugs or have ideas, feel free to open an issue or submit a pull request!
 
