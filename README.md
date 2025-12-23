@@ -6,7 +6,7 @@ Welcome to **Life of Py**, a retro-inspired 2D life simulation game where you na
 
 Life of Py is a pixel art simulation game built with Pygame, combining action-RPG exploration with economic simulation mechanics. You'll explore three distinct locations (home, suburbs, and town), take on various jobs, and accumulate wealth while your personal economy interacts with a dynamic game economy.
 
-Think of it as *This Grand Life RPG-style -ps, that was my inspiration*
+Think of it as *This Grand Life RPG-style* -ps, that was my inspiration
 
 ---
 
