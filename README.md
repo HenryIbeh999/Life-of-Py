@@ -31,12 +31,12 @@ You can pursue one of **7 different jobs**, each with unique salary and requirem
 | Job | Salary | Energy Cost | Level Required |
 |-----|--------|------------|-----------------|
 | Cashier | $37.50/day | 20 | 1 |
-| Salesman | $43.36/day | 20 | 1 |
-| Cook | $49.00/day | 25 | 2 |
-| Clerk | $56.00/day | 20 | 3 |
-| Accountant | $63.00/day | 20 | 5 |
-| Programmer | $90.76/day | 25 | 10 |
-| Doctor | $105.00/day | 30 | 15 |
+| Salesman | $43.36/day | 20 | 3 |
+| Cook | $49.00/day | 25 | 5 |
+| Clerk | $56.00/day | 20 | 8 |
+| Accountant | $63.00/day | 20 | 10 |
+| Programmer | $90.76/day | 25 | 15 |
+| Doctor | $105.00/day | 30 | 20 |
 
 **How it works:**
 - Select a job you meet the level requirements for
